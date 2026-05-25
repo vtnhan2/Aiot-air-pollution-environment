@@ -255,7 +255,7 @@ void loop() {
             // Chỉ gửi mỗi phút 1 lần để tiết kiệm băng thông (tạm thời gửi mỗi 5 giây cho dễ test)
             static unsigned long lastFirebaseUpdate = 0;
             if (millis() - lastFirebaseUpdate > 5000) {
-                firebaseManager.sendData(raw_pm25, data.temperature, data.humidity, data.pressure, data.dustDensity, final_pm25);
+                firebaseManager.sendData(raw_pm25, data.temperature, data.humidity, data.pressure, data.gasVoltage, data.dustDensity, final_pm25);
                 lastFirebaseUpdate = millis();
             }
             #endif

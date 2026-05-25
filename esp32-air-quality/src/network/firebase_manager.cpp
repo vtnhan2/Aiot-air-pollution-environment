@@ -34,7 +34,7 @@ void FirebaseManager::loop() {
     // Không cần xử lý liên tục trong vòng lặp trừ khi bạn muốn listen data.
 }
 
-void FirebaseManager::sendData(float raw_pm25, float temp, float hum, float pres, float filtered_pm25, float predicted_pm25) {
+void FirebaseManager::sendData(float raw_pm25, float temp, float hum, float pres, float gas, float filtered_pm25, float predicted_pm25) {
     if (Firebase.ready() && signupOK) {
         // Tạo đường dẫn với Timestamp (giả lập hoặc dùng NTP)
         // Hiện tại ta chỉ lưu vào biến "current" để Dashboard đọc liên tục.
@@ -44,6 +44,7 @@ void FirebaseManager::sendData(float raw_pm25, float temp, float hum, float pres
         Firebase.RTDB.setFloat(&fbdo, "sensor/temp", temp);
         Firebase.RTDB.setFloat(&fbdo, "sensor/hum", hum);
         Firebase.RTDB.setFloat(&fbdo, "sensor/pres", pres);
+        Firebase.RTDB.setFloat(&fbdo, "sensor/gas", gas);
         
         // Gửi Data đã lọc và Dự báo AI
         Firebase.RTDB.setFloat(&fbdo, "ai/filtered_pm25", filtered_pm25);
