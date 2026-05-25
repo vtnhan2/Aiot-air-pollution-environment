@@ -35,27 +35,24 @@ SensorData SensorManager::readAll() {
     SensorData data;
     data.isValid = true;
     
-    // Read BME280
-    data.temperature = bme.readTemperature();
-    data.humidity = bme.readHumidity();
-    data.pressure = bme.readPressure();
+    // Sinh dữ liệu ảo bằng hàm sine để tạo chuỗi dữ liệu mượt mà như thật
+    float t = millis() / 1000.0; // Thời gian trôi qua (giây)
     
-    // Read SCD40 (Overrides temp/hum if successful since it's inside)
-    float scdTemp = 0, scdHum = 0;
-    uint16_t co2 = 0;
-    if (scd40.readMeasurement(co2, scdTemp, scdHum)) {
-        data.co2 = co2;
-        // You can choose to average BME and SCD temps or pick one
-        // Let's use SCD40 for temp/hum as it's highly accurate photoacoustic
-        data.temperature = scdTemp;
-        data.humidity = scdHum;
-    } else {
-        data.co2 = 0; // 0 indicates invalid read
-    }
+    // PM2.5 dao động từ 10 đến 150 ug/m3
+    data.dustDensity = 80.0 + 70.0 * sin(t * 0.1);
     
-    // Read Dust & Gas
-    data.dustDensity = dust.readDustDensity();
-    data.gasVoltage = mq135.readGasLevel();
+    // Nhiệt độ dao động từ 22 đến 32 °C
+    data.temperature = 27.0 + 5.0 * sin(t * 0.05);
+    
+    // Độ ẩm dao động từ 40 đến 80 %
+    data.humidity = 60.0 + 20.0 * cos(t * 0.07);
+    
+    // Áp suất dao động quanh 1010 hPa
+    data.pressure = 1010.0 + 5.0 * sin(t * 0.02);
+    
+    // CO2 và Khí gas
+    data.co2 = 400 + 200 * abs(sin(t * 0.15));
+    data.gasVoltage = 1.0 + 0.5 * sin(t * 0.08);
     
     return data;
 }
