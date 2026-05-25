@@ -1,0 +1,9 @@
+.pio
+.vscode/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.DS_Store
+model_data.h
+anomaly_thresholds.h
