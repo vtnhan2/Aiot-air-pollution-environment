@@ -23,6 +23,10 @@
 // Cấu hình Database (Đặt thành false nếu chưa setup Firebase để tránh bị spam lỗi API Key trên Serial Monitor)
 #define USE_FIREBASE false 
 
+// Định nghĩa chân Còi Buzzer và LED cảnh báo
+#define PIN_BUZZER 6
+#define PIN_LED_WARN 7
+
 SensorManager sensorManager;
 DisplayManager displayManager;
 
@@ -93,6 +97,12 @@ void setup() {
     
     // Khởi tạo các cảm biến
     sensorManager.begin();
+    
+    // Cấu hình chân còi và LED cảnh báo
+    pinMode(PIN_BUZZER, OUTPUT);
+    pinMode(PIN_LED_WARN, OUTPUT);
+    digitalWrite(PIN_BUZZER, LOW);
+    digitalWrite(PIN_LED_WARN, LOW);
     
     #if USE_FIREBASE
     // Khởi tạo WiFi
@@ -249,6 +259,18 @@ void loop() {
                 (WiFi.status() == WL_CONNECTED),
                 anomaly_detected
             );
+
+            // --- 6. LOGIC CẢNH BÁO CÒI & LED (Dự báo AI quá cao) ---
+            if (final_pm25 >= 80.0f) {
+                // Đóng còi cảnh báo tần số 1000Hz trong 1 giây (không chặn luồng)
+                tone(PIN_BUZZER, 1000, 1000); 
+                digitalWrite(PIN_LED_WARN, HIGH); // Bật LED đỏ báo động
+                Serial.println("--> [ALERT] AI Forecast: Severe Pollution Expected! Buzzer and LED activated.");
+            } else {
+                noTone(PIN_BUZZER);
+                digitalWrite(PIN_LED_WARN, LOW);
+            }
+            // -----------------------------------------------------
             
             // --- 5. GỬI DỮ LIỆU LÊN FIREBASE ---
             #if USE_FIREBASE
