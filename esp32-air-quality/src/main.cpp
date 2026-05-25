@@ -1,18 +1,30 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include "sensors/sensor_manager.h"
 #include <TensorFlowLite_ESP32.h>
 #include "tensorflow/lite/micro/all_ops_resolver.h"
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_error_reporter.h"
 #include "tensorflow/lite/micro/system_setup.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+
+// Includes cho Sensor và AI
+#include "sensors/sensor_manager.h"
 #include "ai/model_data.h"
-// WiFi Credentials
-const char* ssid = "Ruby";
-const char* password = "79797979";
+
+// Includes cho Mạng và Đám mây
+#include "network/wifi_manager.h"
+#include "network/firebase_manager.h"
+#include "display/display_manager.h"
+
+// Thông tin WiFi của bạn
+#define WIFI_SSID "Ruby"
+#define WIFI_PASSWORD "79797979"
+
+// Cấu hình Database (Đặt thành false nếu chưa setup Firebase để tránh bị spam lỗi API Key trên Serial Monitor)
+#define USE_FIREBASE false 
 
 SensorManager sensorManager;
+DisplayManager displayManager;
 
 // TFLite Globals
 const tflite::Model* model = nullptr;
@@ -79,17 +91,21 @@ void setup() {
     delay(2000);
     Serial.println("\n--- AIoT Air Quality System Starting ---");
     
-    // Connect to WiFi
-    Serial.print("Connecting to WiFi: ");
-    Serial.println(ssid);
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("\nWiFi Connected!");
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.localIP());
+    // Khởi tạo các cảm biến
+    sensorManager.begin();
+    
+    #if USE_FIREBASE
+    // Khởi tạo WiFi
+    wifiManager.init(WIFI_SSID, WIFI_PASSWORD);
+    
+    // Khởi tạo Firebase
+    firebaseManager.init();
+    #else
+    Serial.println("[INFO] Firebase is disabled in code. Running in offline mode.");
+    #endif
+
+    // Khởi tạo màn hình
+    displayManager.begin();
 
     // Check if PSRAM is initialized
     if (psramFound()) {
@@ -97,8 +113,6 @@ void setup() {
     } else {
         Serial.println("Warning: PSRAM not found!");
     }
-
-    sensorManager.begin();
     
     Serial.println("\n--- Initializing AI Model (TFLite) ---");
     tflite::InitializeTarget();
@@ -149,16 +163,17 @@ void loop() {
     Serial.printf("Temperature: %.2f °C\n", data.temperature);
     Serial.printf("Humidity: %.2f %%\n", data.humidity);
     Serial.printf("Pressure: %.2f hPa\n", data.pressure);
-    Serial.printf("CO2: %d ppm\n", data.co2);
     Serial.printf("Dust (PM2.5 approx): %.2f ug/m3\n", data.dustDensity);
     Serial.printf("Gas Voltage (MQ135): %.2f V\n", data.gasVoltage);
     
-    // Check WiFi status in loop
+    // Check WiFi status in loop (Chỉ check nếu bật Firebase)
+    #if USE_FIREBASE
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("WiFi Status: Connected");
     } else {
         Serial.println("WiFi Status: Disconnected");
     }
+    #endif
     
     // --- AI Inference ---
     if (input != nullptr) {
@@ -222,6 +237,30 @@ void loop() {
             if (anomaly_detected) {
                 Serial.println("--> [INFO] Prediction was made using filtered data to ensure reliability.");
             }
+            
+            // Cập nhật lên màn hình LCD ST7789
+            displayManager.updateData(
+                data.temperature,
+                data.humidity,
+                raw_pm25,
+                data.dustDensity, // Đã được lọc nhiễu nếu có anomaly
+                final_pm25,       // Dự báo của AI
+                data.gasVoltage,
+                (WiFi.status() == WL_CONNECTED),
+                anomaly_detected
+            );
+            
+            // --- 5. GỬI DỮ LIỆU LÊN FIREBASE ---
+            #if USE_FIREBASE
+            // Chỉ gửi mỗi phút 1 lần để tiết kiệm băng thông (tạm thời gửi mỗi 5 giây cho dễ test)
+            static unsigned long lastFirebaseUpdate = 0;
+            if (millis() - lastFirebaseUpdate > 5000) {
+                firebaseManager.sendData(raw_pm25, data.temperature, data.humidity, data.pressure, data.dustDensity, final_pm25);
+                lastFirebaseUpdate = millis();
+            }
+            #endif
+            // -----------------------------------
+            
         } else {
             Serial.println("AI inference failed!");
         }
