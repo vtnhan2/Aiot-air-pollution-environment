@@ -41,6 +41,12 @@ SensorData SensorManager::readAll() {
     // PM2.5 dao động từ 10 đến 150 ug/m3
     data.dustDensity = 80.0 + 70.0 * sin(t * 0.1);
     
+    // Tạo nhiễu bất thường (Anomaly): 5% cơ hội PM2.5 nhảy vọt lên > 500
+    // Để chứng minh thuật toán Anomaly Detection hoạt động!
+    if (random(0, 100) < 5) {
+        data.dustDensity += 400.0 + random(0, 200);
+    }
+    
     // Nhiệt độ dao động từ 22 đến 32 °C
     data.temperature = 27.0 + 5.0 * sin(t * 0.05);
     

@@ -37,6 +37,35 @@ float inverseScale(float scaled_value, int feature_index) {
     return scaled_value * (FEATURE_MAX[feature_index] - FEATURE_MIN[feature_index]) + FEATURE_MIN[feature_index];
 }
 
+// --- ANOMALY DETECTION (Z-Score Based) ---
+float ema_pm25 = -1.0f; // Exponential Moving Average
+float ema_variance = 0.0f;
+const float EMA_ALPHA = 0.2f; // Learning rate (0-1)
+const float ANOMALY_THRESHOLD_Z = 3.0f; // 3 standard deviations for 99.7% confidence
+
+bool isAnomaly(float current_pm25) {
+    if (ema_pm25 < 0) { // First reading initialization
+        ema_pm25 = current_pm25;
+        return false;
+    }
+    
+    float diff = current_pm25 - ema_pm25;
+    float stddev = sqrt(ema_variance);
+    if (stddev < 10.0f) stddev = 10.0f; // Base variance floor to prevent division by zero for stable signals
+    
+    float z_score = abs(diff) / stddev;
+    
+    if (z_score > ANOMALY_THRESHOLD_Z) {
+        return true; // Sudden spike detected!
+    }
+    
+    // Normal reading -> Update EMA and Variance
+    ema_pm25 = (EMA_ALPHA * current_pm25) + ((1.0f - EMA_ALPHA) * ema_pm25);
+    ema_variance = (EMA_ALPHA * diff * diff) + ((1.0f - EMA_ALPHA) * ema_variance);
+    return false;
+}
+// -----------------------------------------
+
 // Allocate memory for the tensor arena
 constexpr int kTensorArenaSize = 2 * 1024 * 1024; // 2MB in PSRAM for LSTM and weights
 // Put arena in PSRAM if available, otherwise use normal RAM
@@ -140,8 +169,21 @@ void loop() {
             }
         }
         
+        SensorData data = sensorManager.readAll();
+        
+        // --- 1. ANOMALY DETECTION FILTER ---
+        bool anomaly_detected = false;
+        float raw_pm25 = data.dustDensity; // Save raw for logging
+        
+        if (isAnomaly(data.dustDensity)) {
+            Serial.printf("\n[⚠️ ANOMALY DETECTED] Sudden PM2.5 spike: %.1f ug/m3. Filtered out!\n", data.dustDensity);
+            data.dustDensity = ema_pm25; // Override noisy data with stable moving average
+            anomaly_detected = true;
+        }
+        // -----------------------------------
+        
         // Add new reading to the end of the buffer
-        // 1. Scale raw values to [0, 1] using MinMaxScaler
+        // 2. Scale raw values to [0, 1] using MinMaxScaler
         float scaled_pm25 = scaleData(data.dustDensity, 0);
         float scaled_dewp = scaleData(data.humidity,    1); // Using humidity as DEWP proxy for now
         float scaled_temp = scaleData(data.temperature, 2);
@@ -176,6 +218,10 @@ void loop() {
             
             Serial.printf("--> AI Prediction (PM2.5 next hour): %.2f ug/m3\n", final_pm25);
             Serial.printf("--> Inference time: %lu ms\n", inference_time);
+            
+            if (anomaly_detected) {
+                Serial.println("--> [INFO] Prediction was made using filtered data to ensure reliability.");
+            }
         } else {
             Serial.println("AI inference failed!");
         }

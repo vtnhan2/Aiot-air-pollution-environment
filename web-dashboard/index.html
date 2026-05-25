@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIoT Air Quality Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>AIoT <span>Air Quality</span> System</h1>
+            <div class="status-badge">
+                <span class="dot"></span> Live Demo
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Hiện tại -->
+            <div class="glass-card current-stats">
+                <div class="card-header-flex">
+                    <h2>Current Environment</h2>
+                    <div id="anomaly-alert" class="anomaly-badge hidden">⚠️ Anomaly Detected!</div>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <span class="label">PM2.5 (Dust)</span>
+                        <div class="value"><span id="val-pm25">--</span> <small>µg/m³</small></div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">Temperature</span>
+                        <div class="value"><span id="val-temp">--</span> <small>°C</small></div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">Humidity</span>
+                        <div class="value"><span id="val-hum">--</span> <small>%</small></div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">Air Pressure</span>
+                        <div class="value"><span id="val-pres">--</span> <small>hPa</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dự đoán AI -->
+            <div class="glass-card ai-predict-card">
+                <div class="ai-header">
+                    <div class="ai-icon">🧠</div>
+                    <h2>AI Prediction (Next 1 Hour)</h2>
+                </div>
+                <div class="ai-value-container">
+                    <div class="ai-value"><span id="val-predict">--</span> <small>µg/m³</small></div>
+                    <div class="ai-status" id="ai-status">Calculating...</div>
+                </div>
+                <p class="ai-note">Powered by Edge Computing (ESP32-S3)</p>
+            </div>
+        </div>
+
+        <!-- Biểu đồ -->
+        <div class="glass-card chart-container">
+            <h2>Real-time vs AI Forecast (PM2.5)</h2>
+            <canvas id="airChart"></canvas>
+        </div>
+
+        <!-- Giải thích AI -->
+        <div class="glass-card info-card">
+            <h2>How Our AI Works 🤖</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <h3>1. Thuật toán LSTM</h3>
+                    <p>Mô hình sử dụng mạng Neural Network <strong>LSTM (Long Short-Term Memory)</strong>. Khác với thuật toán thông thường, LSTM có bộ nhớ để ghi nhớ chuỗi sự kiện trong quá khứ (chuỗi dữ liệu 24 giờ liên tiếp của Bụi, Nhiệt, Ẩm) để dự báo chính xác nồng độ ô nhiễm trong tương lai.</p>
+                </div>
+                <div class="info-item">
+                    <h3>2. Edge Computing</h3>
+                    <p>Thay vì gửi dữ liệu lên Cloud để xử lý (tốn độ trễ và phụ thuộc mạng), mô hình AI được nén bằng <strong>TensorFlow Lite Micro</strong> (Quantization 8-bit) và chạy trực tiếp ngay trên vi điều khiển <strong>ESP32-S3</strong>. Thời gian suy luận cực nhanh chỉ mất ~217ms!</p>
+                </div>
+                <div class="info-item">
+                    <h3>3. Anomaly Detection</h3>
+                    <p>Dữ liệu trước khi vào LSTM được đi qua bộ lọc <strong>Isolation Forest</strong> để loại bỏ các điểm dị thường (nhiễu cục bộ do người thổi khói thuốc vào cảm biến), giúp kết quả dự báo luôn giữ được độ tin cậy cao.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
