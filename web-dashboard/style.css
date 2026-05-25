@@ -381,9 +381,9 @@ input:checked + .slider:before {
 /* Radial Gauges */
 .gauge-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    padding-top: 1rem;
+    grid-template-columns: repeat(4, 1fr); /* Đổi sang 1 hàng 4 cột cho gọn và đỡ trống trải */
+    gap: 1rem;
+    padding-top: 0.5rem;
 }
 
 .gauge-box {
@@ -393,21 +393,24 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.02);
-    border-radius: 20px;
-    padding: 1.5rem;
+    border-radius: 16px;
+    padding: 1rem; /* Giảm padding xuống 1rem cho gọn gàng */
+    width: 100%;
+    max-width: 180px; /* Giới hạn chiều rộng tối đa tránh bị bè ngang */
+    margin: 0 auto;
     border: 1px solid rgba(255,255,255,0.03);
     transition: all 0.3s ease;
 }
 
 .gauge-box:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
 .gauge-svg {
-    width: 120px;
-    height: 120px;
+    width: 90px;  /* Giảm kích thước vòng tròn từ 120px xuống 90px cho cân đối */
+    height: 90px;
     transform: rotate(-90deg);
 }
 
@@ -429,28 +432,28 @@ input:checked + .slider:before {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -30%);
+    transform: translate(-50%, -35%);
     text-align: center;
     width: 100%;
 }
 
 .gauge-label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.65rem; /* Giảm font label */
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.25rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.15rem;
 }
 
 .gauge-value-text {
-    font-size: 1.6rem;
+    font-size: 1.25rem; /* Giảm font số hiển thị bên trong vòng tròn */
     font-weight: 700;
     font-family: 'Outfit', sans-serif;
 }
 
 .gauge-value-text small {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--text-secondary);
     font-weight: 400;
 }
@@ -575,12 +578,18 @@ input:checked + .slider:before {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+    .gauge-grid {
+        grid-template-columns: repeat(2, 1fr); /* Chuyển thành 2x2 trên màn hình vừa */
+    }
+}
+
 @media (max-width: 900px) {
     .dashboard-grid, .info-grid {
         grid-template-columns: 1fr;
     }
     .gauge-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     .chart-header-flex {
         flex-direction: column;
@@ -589,6 +598,12 @@ input:checked + .slider:before {
     .chart-tabs {
         width: 100%;
         overflow-x: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .gauge-grid {
+        grid-template-columns: 1fr; /* 1 cột trên điện thoại nhỏ */
     }
 }
 
