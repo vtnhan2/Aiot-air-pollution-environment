@@ -76,102 +76,172 @@ const airChart = new Chart(ctx, {
     }
 });
 
-// Anomaly Detection State (Z-Score Based, matching C++)
-let ema_pm25 = -1;
-let ema_variance = 0;
-const EMA_ALPHA = 0.2;
-const ANOMALY_THRESHOLD_Z = 3.0;
-let anomalyTimer = null;
+// === CẬP NHẬT: KẾT NỐI FIREBASE HOẶC CHẠY DEMO OFFLINE ===
+const DEMO_MODE = true; // CHUYỂN THÀNH true để chạy demo giả lập offline, false để kết nối Firebase thật
 
-// Giả lập dữ liệu theo sóng hình sin (Giống hệt code sensor_manager.cpp trên ESP32)
-// Mục đích: Thể hiện Demo Dashboard cho tới khi Firebase được ráp nối
-function updateDashboard() {
-    const t = Date.now() / 1000; // Thời gian tính bằng giây
+// Biến từ index.html
+const db = window.firebaseDB;
+const dbRef = window.firebaseRef;
+const onValue = window.firebaseOnValue;
+
+if (DEMO_MODE) {
+    console.log("Running in OFFLINE DEMO MODE...");
+    setupDemoSimulation();
+} else if (db && dbRef && onValue) {
+    console.log("Firebase is initialized. Waiting for data...");
     
-    // Sinh data ảo (Raw)
-    let rawPm25 = 80.0 + 70.0 * Math.sin(t * 0.1);
-    
-    // Sinh nhiễu bất thường: 5% tỷ lệ
-    let isSpike = false;
-    if (Math.random() < 0.05) {
-        rawPm25 += 400 + Math.random() * 200;
-        isSpike = true;
-    }
-    
-    // --- BỘ LỌC ANOMALY DETECTION (Z-Score) ---
-    let filteredPm25 = rawPm25;
-    let anomalyDetected = false;
-    
-    if (ema_pm25 < 0) {
-        ema_pm25 = rawPm25;
-    } else {
-        let diff = rawPm25 - ema_pm25;
-        let stddev = Math.sqrt(ema_variance);
-        if (stddev < 10.0) stddev = 10.0;
-        
-        let z_score = Math.abs(diff) / stddev;
-        
-        if (z_score > ANOMALY_THRESHOLD_Z) {
-            anomalyDetected = true;
-            filteredPm25 = ema_pm25; // Block the noise!
+    // Lắng nghe dữ liệu realtime từ Firebase
+    const sensorRef = dbRef(db, 'sensor');
+    const aiRef = dbRef(db, 'ai');
+
+    onValue(sensorRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            // Hiển thị text
+            document.getElementById('val-temp').textContent = data.temp ? data.temp.toFixed(1) : '--';
+            document.getElementById('val-hum').textContent = data.hum ? data.hum.toFixed(1) : '--';
+            document.getElementById('val-pres').textContent = data.pres ? data.pres.toFixed(1) : '--';
             
-            // Show Alert UI
-            const alertEl = document.getElementById('anomaly-alert');
-            alertEl.classList.remove('hidden');
-            if(anomalyTimer) clearTimeout(anomalyTimer);
-            anomalyTimer = setTimeout(() => { alertEl.classList.add('hidden'); }, 3000);
-            
-        } else {
-            // Update Moving Average normally
-            ema_pm25 = (EMA_ALPHA * rawPm25) + ((1 - EMA_ALPHA) * ema_pm25);
-            ema_variance = (EMA_ALPHA * diff * diff) + ((1 - EMA_ALPHA) * ema_variance);
+            // Xử lý Anomaly Alert (Nếu raw khác quá xa filtered)
+            // (Chỉ mang tính chất demo UI, logic thật đã xử lý trên ESP32)
+            if (window.lastFilteredPm25 && Math.abs(data.raw_pm25 - window.lastFilteredPm25) > 100) {
+                const alertEl = document.getElementById('anomaly-alert');
+                alertEl.classList.remove('hidden');
+                setTimeout(() => { alertEl.classList.add('hidden'); }, 3000);
+            }
+
+            window.lastRawPm25 = data.raw_pm25;
         }
+    });
+
+    onValue(aiRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            document.getElementById('val-pm25').textContent = data.filtered_pm25 ? data.filtered_pm25.toFixed(1) : '--';
+            document.getElementById('val-predict').textContent = data.predicted_pm25 ? data.predicted_pm25.toFixed(1) : '--';
+            
+            window.lastFilteredPm25 = data.filtered_pm25;
+            window.lastPredictedPm25 = data.predicted_pm25;
+
+            // Đổi màu cảnh báo
+            const statusEl = document.getElementById('ai-status');
+            const p = data.predicted_pm25;
+            if (p < 50) {
+                statusEl.textContent = 'Good';
+                statusEl.style.color = '#34d399';
+            } else if (p < 100) {
+                statusEl.textContent = 'Moderate';
+                statusEl.style.color = '#fbbf24';
+            } else {
+                statusEl.textContent = 'Unhealthy';
+                statusEl.style.color = '#ef4444';
+            }
+
+            // Cập nhật biểu đồ (Mỗi khi có data mới từ AI)
+            updateChartWithData(window.lastFilteredPm25, window.lastPredictedPm25, window.lastRawPm25);
+        }
+    });
+
+} else {
+    console.error("Firebase SDK not loaded properly! Running fallback demo...");
+    setupDemoSimulation();
+}
+
+// --- HÀM GIẢ LẬP ĐỂ QUICK DEMO DASHBOARD OFFLINE ---
+function setupDemoSimulation() {
+    let ema_pm25 = -1;
+    let ema_variance = 0;
+    const EMA_ALPHA = 0.2;
+    const ANOMALY_THRESHOLD_Z = 3.0;
+    let anomalyTimer = null;
+
+    function runSimulationStep() {
+        const t = Date.now() / 1000;
+        
+        // 1. Tạo bụi thô (Raw PM2.5) kèm gai nhiễu ngẫu nhiên
+        let rawPm25 = 80.0 + 70.0 * Math.sin(t * 0.1);
+        let anomalyDetected = false;
+        
+        if (Math.random() < 0.05) { // 5% tỷ lệ xảy ra gai nhiễu
+            rawPm25 += 400.0 + Math.random() * 200.0;
+        }
+
+        // 2. Chạy bộ lọc Z-Score (Y hệt C++ trên ESP32)
+        let filteredPm25 = rawPm25;
+        if (ema_pm25 < 0) {
+            ema_pm25 = rawPm25;
+        } else {
+            let diff = rawPm25 - ema_pm25;
+            let stddev = Math.sqrt(ema_variance);
+            if (stddev < 10.0) stddev = 10.0;
+            
+            let z_score = Math.abs(diff) / stddev;
+            if (z_score > ANOMALY_THRESHOLD_Z) {
+                anomalyDetected = true;
+                filteredPm25 = ema_pm25; // Chặn nhiễu!
+                
+                // Hiển thị badge cảnh báo
+                const alertEl = document.getElementById('anomaly-alert');
+                alertEl.classList.remove('hidden');
+                if (anomalyTimer) clearTimeout(anomalyTimer);
+                anomalyTimer = setTimeout(() => { alertEl.classList.add('hidden'); }, 3000);
+            } else {
+                ema_pm25 = (EMA_ALPHA * rawPm25) + ((1 - EMA_ALPHA) * ema_pm25);
+                ema_variance = (EMA_ALPHA * diff * diff) + ((1 - EMA_ALPHA) * ema_variance);
+            }
+        }
+
+        // 3. Giả lập các chỉ số môi trường khác
+        const temp = 27.0 + 5.0 * Math.sin(t * 0.05);
+        const hum = 60.0 + 20.0 * Math.cos(t * 0.07);
+        const pres = 1010.0 + 5.0 * Math.sin(t * 0.02);
+        
+        // 4. Dự báo AI (Dựa trên bụi đã lọc và tịnh tiến thời gian)
+        const predictedPm25 = 80.0 + 70.0 * Math.sin((t + 5) * 0.1);
+
+        // 5. Cập nhật DOM Text
+        document.getElementById('val-temp').textContent = temp.toFixed(1);
+        document.getElementById('val-hum').textContent = hum.toFixed(1);
+        document.getElementById('val-pres').textContent = pres.toFixed(1);
+        document.getElementById('val-pm25').textContent = filteredPm25.toFixed(1);
+        document.getElementById('val-predict').textContent = predictedPm25.toFixed(1);
+
+        // 6. Đổi màu trạng thái AI
+        const statusEl = document.getElementById('ai-status');
+        if (predictedPm25 < 50) {
+            statusEl.textContent = 'Good';
+            statusEl.style.color = '#34d399';
+        } else if (predictedPm25 < 100) {
+            statusEl.textContent = 'Moderate';
+            statusEl.style.color = '#fbbf24';
+        } else {
+            statusEl.textContent = 'Unhealthy';
+            statusEl.style.color = '#ef4444';
+        }
+
+        // 7. Đẩy lên biểu đồ
+        updateChartWithData(filteredPm25, predictedPm25, rawPm25);
     }
-    // ------------------------------------------
 
-    const temp = 27.0 + 5.0 * Math.sin(t * 0.05);
-    const hum = 60.0 + 20.0 * Math.cos(t * 0.07);
-    const pres = 1010.0 + 5.0 * Math.sin(t * 0.02);
-    
-    // Sinh data dự báo (AI Forecast is based on filtered data, shifted in time)
-    const predictedPm25 = 80.0 + 70.0 * Math.sin((t + 5) * 0.1); 
+    // Chạy vòng lặp mỗi 1 giây
+    setInterval(runSimulationStep, 1000);
+    runSimulationStep();
+}
 
-    // Update Text DOM
-    document.getElementById('val-pm25').textContent = filteredPm25.toFixed(1);
-    document.getElementById('val-temp').textContent = temp.toFixed(1);
-    document.getElementById('val-hum').textContent = hum.toFixed(1);
-    document.getElementById('val-pres').textContent = pres.toFixed(1);
-    
-    // Cập nhật thẻ AI Predict
-    const predictEl = document.getElementById('val-predict');
-    const statusEl = document.getElementById('ai-status');
-    predictEl.textContent = predictedPm25.toFixed(1);
-    
-    // Đổi màu cảnh báo AI
-    statusEl.className = 'ai-status';
-    if(predictedPm25 < 50) {
-        statusEl.textContent = 'Good Air Quality';
-        statusEl.classList.add('status-good');
-    } else if(predictedPm25 < 100) {
-        statusEl.textContent = 'Moderate - Watch out';
-        statusEl.classList.add('status-warn');
-    } else {
-        statusEl.textContent = 'Warning: Severe Pollution Expected!';
-        statusEl.classList.add('status-bad');
-    }
+function updateChartWithData(filtered, predicted, raw) {
+    if (filtered === undefined || predicted === undefined || raw === undefined) return;
 
-    // Update Chart
     const now = new Date();
     const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
                        now.getMinutes().toString().padStart(2, '0') + ':' + 
                        now.getSeconds().toString().padStart(2, '0');
                        
     chartData.labels.push(timeString);
-    chartData.datasets[0].data.push(filteredPm25);
-    chartData.datasets[1].data.push(predictedPm25);
-    chartData.datasets[2].data.push(rawPm25);
+    chartData.datasets[0].data.push(filtered);
+    chartData.datasets[1].data.push(predicted);
+    chartData.datasets[2].data.push(raw);
     
-    // Giữ cho biểu đồ không bị quá dài (Giới hạn 30 điểm cho dễ nhìn gai nhiễu)
+    // Giữ cho biểu đồ không bị quá dài (Giới hạn 30 điểm)
     if(chartData.labels.length > 30) {
         chartData.labels.shift();
         chartData.datasets[0].data.shift();
@@ -181,7 +251,3 @@ function updateDashboard() {
     
     airChart.update('none'); // Update không có animation để mượt hơn
 }
-
-// Chạy vòng lặp cập nhật mỗi 1 giây (1000ms)
-setInterval(updateDashboard, 1000);
-updateDashboard(); // Gọi ngay lập tức lần đầu
