@@ -14,14 +14,11 @@ Dựa trên yêu cầu của bạn (file `REQ.md`) và lộ trình hoàn thiện
 *   **Cảm biến Khí Gas & VOCs:**
     *   `MQ135` (Cảm biến chất lượng không khí, phát hiện NH3, NOx, cồn, Benzen, khói...). Giao tiếp Analog.
 *   **Cảm biến Nhiệt độ, Độ ẩm & Áp suất:**
-    *   `BME280` (Giao tiếp I2C). Rất chính xác cho môi trường.
-*   **Cảm biến CO2 (Tùy chọn thêm để xịn hơn):**
-    *   `SCD40` hoặc `SCD41` (Giao tiếp I2C). Đây là cảm biến CO2 chuẩn quang âm học rất xịn, đang được tích hợp sẵn trong code hiện tại của bạn.
+    *   `BME280` (Giao tiếp I2C). Rất chính xác, đóng vai trò sống còn trong việc cung cấp dữ liệu môi trường (Temp, Hum, Pres) cho mô hình AI dự báo bụi PM2.5.
 
 ## 3. Giao diện Hiển thị (Display)
-*   **Màn hình TFT:** `ILI9341` (kích thước 2.4" đến 2.8") hoặc `ST7789` (kích thước 1.54"). 
-    *   Giao tiếp: SPI. 
-    *   *Tính năng:* Hiển thị màu sắc giao diện Dashboard mượt mà bằng LVGL, vẽ biểu đồ Line chart cho PM2.5 dự đoán.
+*   **Màn hình TFT:** `ST7789` (kích thước 1.54 inch, độ phân giải 240x240 px, giao tiếp SPI).
+    *   *Tính năng:* Form vuông vức hiện đại giống Apple Watch, dùng tấm nền IPS hiển thị màu sắc giao diện Dashboard cực kỳ sắc nét. Hỗ trợ DMA vẽ biểu đồ tốc độ cao.
 
 ## 4. Cơ cấu chấp hành & Cảnh báo (Actuators & Alerts)
 *   **Module Relay:** Module Relay 1 kênh hoặc 2 kênh (5V). Dùng để điều khiển quạt hút hoặc máy lọc không khí (Tích hợp tính năng AI tự bật quạt trước khi không khí ô nhiễm).
@@ -35,4 +32,4 @@ Dựa trên yêu cầu của bạn (file `REQ.md`) và lộ trình hoàn thiện
 *   **Trở & Tụ:** Tùy chọn (vài con điện trở 10k kéo pull-up cho I2C nếu module cảm biến chưa có).
 
 ---
-> **Ghi chú tiến độ:** Hiện tại trong source code đã có sẵn Driver và class quản lý toàn bộ các cảm biến `PMS/GP2Y`, `MQ135`, `BME280`, `SCD40`. Bộ nhớ AI (PSRAM) và cấu trúc chạy AI đều đã tích hợp xong. Bạn chỉ cần mua đủ linh kiện về cắm đúng chân (Pins) là hệ thống sẽ chạy!
+> **Ghi chú tiến độ:** Hiện tại trong source code đã loại bỏ hoàn toàn các cảm biến không cần thiết để tối ưu bộ nhớ. Bộ não AI (Tensorflow Lite) đã sẵn sàng. Bạn chỉ cần mua đúng combo linh kiện trên là hệ thống sẽ chạy cực mượt!
