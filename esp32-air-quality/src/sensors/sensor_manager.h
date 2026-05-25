@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 #include "bme280.h"
-#include "scd40.h"
 #include "gp2y1014.h"
 #include "mq135.h"
 
@@ -19,7 +18,6 @@ struct SensorData {
     float temperature;
     float humidity;
     float pressure;
-    uint16_t co2;
     float dustDensity;
     float gasVoltage;
     bool isValid;
@@ -33,7 +31,6 @@ public:
 
 private:
     BME280Sensor bme;
-    SCD40Sensor scd40;
     GP2Y1014Sensor dust;
     MQ135Sensor mq135;
 };

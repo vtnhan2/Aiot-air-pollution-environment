@@ -4,8 +4,14 @@ BME280Sensor::BME280Sensor(uint8_t address) : i2c_address(address) {}
 
 bool BME280Sensor::begin(TwoWire *theWire) {
     if (!bme.begin(i2c_address, theWire)) {
-        Serial.println("Could not find a valid BME280 sensor, check wiring!");
-        return false;
+        Serial.printf("Could not find BME280 at 0x%02X, trying alternative address...\n", i2c_address);
+        uint8_t alt_address = (i2c_address == 0x76) ? 0x77 : 0x76;
+        if (!bme.begin(alt_address, theWire)) {
+            Serial.println("Could not find a valid BME280 sensor at both 0x76 and 0x77, check wiring!");
+            return false;
+        }
+        i2c_address = alt_address;
+        Serial.printf("BME280 found at alternative address: 0x%02X\n", i2c_address);
     }
     
     // Default settings from datasheet

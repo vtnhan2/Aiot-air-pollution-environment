@@ -15,12 +15,6 @@ void SensorManager::begin() {
     }
     delay(500);
     
-    Serial.println("Initializing SCD40...");
-    if (!scd40.begin(&Wire)) {
-        Serial.println("Failed to init SCD40!");
-    }
-    delay(500);
-    
     Serial.println("Initializing GP2Y1014 Dust Sensor...");
     dust.begin();
     delay(500);
@@ -56,8 +50,7 @@ SensorData SensorManager::readAll() {
     // Áp suất dao động quanh 1010 hPa
     data.pressure = 1010.0 + 5.0 * sin(t * 0.02);
     
-    // CO2 và Khí gas
-    data.co2 = 400 + 200 * abs(sin(t * 0.15));
+    // Khí gas
     data.gasVoltage = 1.0 + 0.5 * sin(t * 0.08);
     
     return data;
