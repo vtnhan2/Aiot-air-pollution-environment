@@ -408,9 +408,15 @@ input:checked + .slider:before {
     box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
-.gauge-svg {
-    width: 90px;  /* Giảm kích thước vòng tròn từ 120px xuống 90px cho cân đối */
+.gauge-wrapper {
+    position: relative;
+    width: 90px;
     height: 90px;
+}
+
+.gauge-svg {
+    width: 100%;
+    height: 100%;
     transform: rotate(-90deg);
 }
 
@@ -432,18 +438,20 @@ input:checked + .slider:before {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -35%);
+    transform: translate(-50%, -50%);
     text-align: center;
     width: 100%;
 }
 
 .gauge-label {
     display: block;
-    font-size: 0.65rem; /* Giảm font label */
+    font-size: 0.7rem;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-align: center;
 }
 
 .gauge-value-text {

@@ -68,46 +68,54 @@
                 <div class="gauge-grid">
                     <!-- PM2.5 Gauge -->
                     <div class="gauge-box">
-                        <svg class="gauge-svg" viewBox="0 0 120 120">
-                            <circle class="gauge-bg" cx="60" cy="60" r="50" />
-                            <circle class="gauge-value" id="gauge-pm25-path" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
-                        </svg>
-                        <div class="gauge-info">
-                            <span class="gauge-label">PM2.5 (Bụi)</span>
-                            <div class="gauge-value-text"><span id="val-pm25">--</span> <small>µg</small></div>
+                        <span class="gauge-label">PM2.5 (Bụi)</span>
+                        <div class="gauge-wrapper">
+                            <svg class="gauge-svg" viewBox="0 0 120 120">
+                                <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                                <circle class="gauge-value" id="gauge-pm25-path" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
+                            </svg>
+                            <div class="gauge-info">
+                                <div class="gauge-value-text"><span id="val-pm25">--</span> <small>µg</small></div>
+                            </div>
                         </div>
                     </div>
                     <!-- Temp Gauge -->
                     <div class="gauge-box">
-                        <svg class="gauge-svg" viewBox="0 0 120 120">
-                            <circle class="gauge-bg" cx="60" cy="60" r="50" />
-                            <circle class="gauge-value" id="gauge-temp-path" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
-                        </svg>
-                        <div class="gauge-info">
-                            <span class="gauge-label">Temperature</span>
-                            <div class="gauge-value-text"><span id="val-temp">--</span> <small>°C</small></div>
+                        <span class="gauge-label">Temperature</span>
+                        <div class="gauge-wrapper">
+                            <svg class="gauge-svg" viewBox="0 0 120 120">
+                                <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                                <circle class="gauge-value" id="gauge-temp-path" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
+                            </svg>
+                            <div class="gauge-info">
+                                <div class="gauge-value-text"><span id="val-temp">--</span> <small>°C</small></div>
+                            </div>
                         </div>
                     </div>
                     <!-- Hum Gauge -->
                     <div class="gauge-box">
-                        <svg class="gauge-svg" viewBox="0 0 120 120">
-                            <circle class="gauge-bg" cx="60" cy="60" r="50" />
-                            <circle class="gauge-value" id="gauge-hum-path" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
-                        </svg>
-                        <div class="gauge-info">
-                            <span class="gauge-label">Humidity</span>
-                            <div class="gauge-value-text"><span id="val-hum">--</span> <small>%</small></div>
+                        <span class="gauge-label">Humidity</span>
+                        <div class="gauge-wrapper">
+                            <svg class="gauge-svg" viewBox="0 0 120 120">
+                                <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                                <circle class="gauge-value" id="gauge-hum-path" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
+                            </svg>
+                            <div class="gauge-info">
+                                <div class="gauge-value-text"><span id="val-hum">--</span> <small>%</small></div>
+                            </div>
                         </div>
                     </div>
                     <!-- Gas Gauge -->
                     <div class="gauge-box">
-                        <svg class="gauge-svg" viewBox="0 0 120 120">
-                            <circle class="gauge-bg" cx="60" cy="60" r="50" />
-                            <circle class="gauge-value" id="gauge-pres-path" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
-                        </svg>
-                        <div class="gauge-info">
-                            <span class="gauge-label">MQ135 Gas</span>
-                            <div class="gauge-value-text"><span id="val-pres">--</span> <small>V</small></div>
+                        <span class="gauge-label">MQ135 Gas</span>
+                        <div class="gauge-wrapper">
+                            <svg class="gauge-svg" viewBox="0 0 120 120">
+                                <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                                <circle class="gauge-value" id="gauge-pres-path" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" />
+                            </svg>
+                            <div class="gauge-info">
+                                <div class="gauge-value-text"><span id="val-pres">--</span> <small>V</small></div>
+                            </div>
                         </div>
                     </div>
                 </div>
