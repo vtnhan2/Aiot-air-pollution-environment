@@ -7,10 +7,10 @@ import urllib.request
 import zipfile
 
 # --- 1. CONFIGURATION ---
-SEQ_LENGTH = 24  # Use past 24 hours to predict
+SEQ_LENGTH = 6  # Reduced from 24 to 6 to fit in ESP32 TFLM buffer limits
 PREDICT_AHEAD = 1 # Predict 1 hour ahead
 BATCH_SIZE = 64
-EPOCHS = 10
+EPOCHS = 2
 DATA_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/00381/PRSA_data_2010.1.1-2014.12.31.csv"
 DATA_FILE = "PRSA_data.csv"
 MODEL_NAME = "pm25_lstm"
