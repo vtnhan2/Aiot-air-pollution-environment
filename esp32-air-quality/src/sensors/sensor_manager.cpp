@@ -9,8 +9,10 @@ void SensorManager::begin() {
     Wire.begin(PIN_I2C_SDA, PIN_I2C_SCL);
     delay(500);
     
+    #if USE_REAL_SENSORS
     Serial.println("Initializing BME280...");
-    if (!bme.begin(&Wire)) {
+    bme_ok = bme.begin(&Wire);
+    if (!bme_ok) {
         Serial.println("Failed to init BME280!");
     }
     delay(500);
@@ -22,6 +24,10 @@ void SensorManager::begin() {
     Serial.println("Initializing MQ135...");
     mq135.begin();
     delay(500);
+    #else
+    Serial.println("[INFO] Running in SENSOR SIMULATION mode.");
+    #endif
+    
     Serial.println("Sensor initialization finished.");
 }
 
@@ -29,7 +35,23 @@ SensorData SensorManager::readAll() {
     SensorData data;
     data.isValid = true;
     
-    // Sinh dữ liệu ảo bằng hàm sine để tạo chuỗi dữ liệu mượt mà như thật
+    #if USE_REAL_SENSORS
+    // Đọc dữ liệu thực tế từ cảm biến
+    if (bme_ok) {
+        data.temperature = bme.readTemperature();
+        data.humidity = bme.readHumidity();
+        data.pressure = bme.readPressure();
+    } else {
+        // Fallback nếu BME280 bị lỗi khi chạy
+        data.temperature = 25.0f;
+        data.humidity = 50.0f;
+        data.pressure = 1013.25f;
+    }
+    
+    data.dustDensity = dust.readDustDensity();
+    data.gasVoltage = mq135.readGasLevel();
+    #else
+    // Sinh dữ liệu ảo bằng hàm sine để tạo chuỗi dữ liệu mượt mà như thật (chế độ test AI)
     float t = millis() / 1000.0; // Thời gian trôi qua (giây)
     
     // PM2.5 dao động từ 10 đến 150 ug/m3
@@ -52,6 +74,7 @@ SensorData SensorManager::readAll() {
     
     // Khí gas
     data.gasVoltage = 1.0 + 0.5 * sin(t * 0.08);
+    #endif
     
     return data;
 }

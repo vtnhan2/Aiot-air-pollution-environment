@@ -14,6 +14,9 @@
 
 #define PIN_MQ135_MEASURE 1
 
+// Định nghĩa chế độ đọc cảm biến: true = cảm biến thật, false = giả lập (sine wave)
+#define USE_REAL_SENSORS false
+
 struct SensorData {
     float temperature;
     float humidity;
@@ -33,4 +36,5 @@ private:
     BME280Sensor bme;
     GP2Y1014Sensor dust;
     MQ135Sensor mq135;
+    bool bme_ok = false;
 };
