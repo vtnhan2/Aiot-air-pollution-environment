@@ -8,6 +8,8 @@
 \usepackage{hyperref}
 \usepackage{geometry}
 \usepackage{color}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
 
 % Cấu hình lề trang chuẩn báo cáo
 \geometry{
@@ -166,6 +168,55 @@ Sơ đồ kết nối chân giữa ESP32-S3 và các thiết bị ngoại vi đ�
 \subsection{Khuyến nghị cấp nguồn hệ thống}
 Do cảm biến khí MQ135 có bộ phận sấy nóng bên trong tiêu thụ dòng điện rất lớn (lên tới $150\text{mA}$), đồng thời bóng LED hồng ngoại của cảm biến bụi Sharp liên tục nháy xung dòng cao, việc lấy nguồn $5\text{V}$ trực tiếp từ cổng USB của ESP32 sẽ gây ra sụt áp tức thời, làm vi điều khiển bị khởi động lại ngẫu nhiên. Vì vậy, hệ thống bắt buộc phải sử dụng module nguồn ngoài MB102 cấp điện áp $5\text{V}$ độc lập cho cảm biến và nối chung chân GND với ESP32-S3.
 
+\subsection{Sơ đồ cấu trúc phần cứng (UML Component Diagram)}
+Dưới đây là sơ đồ UML Component thể hiện sự kết nối vật lý và giao thức truyền thông giữa ESP32-S3 và các khối cảm biến, hiển thị, nguồn cũng như các cơ cấu cảnh báo thực tế (Hình~\ref{fig:hardware_components}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.8cm and 1.5cm,
+    block/.style={rectangle, draw, fill=blue!10, text width=2.8cm, text centered, minimum height=1cm, rounded corners, font=\small},
+    mcu/.style={rectangle, draw, fill=red!15, text width=3.5cm, text centered, minimum height=1.8cm, rounded corners, font=\bfseries},
+    power/.style={rectangle, draw, fill=yellow!15, text width=2.2cm, text centered, minimum height=1cm, rounded corners, font=\small},
+    actuator/.style={rectangle, draw, fill=green!15, text width=2.2cm, text centered, minimum height=1cm, rounded corners, font=\small},
+    line/.style={draw, -latex', thick}
+]
+    % Central MCU
+    \node[mcu] (esp) {ESP32-S3 MCU\\(16MB Flash / 8MB PSRAM)};
+    
+    % Sensors (Top)
+    \node[block, above=of esp] (bme) {BME280\\(Nhiệt/Ẩm/Áp suất)};
+    \node[block, left=of bme] (sharp) {Sharp GP2Y1014\\(Cảm biến Bụi)};
+    \node[block, right=of bme] (mq135) {MQ135\\(Cảm biến Khí độc)};
+    
+    % Actuators & Display (Bottom)
+    \node[block, below=of esp] (lcd) {ST7789 LCD\\(Màn hình hiển thị)};
+    \node[actuator, left=of lcd] (buzzer) {Buzzer (Còi)};
+    \node[actuator, right=of lcd] (led) {Warning LED (Đỏ)};
+    
+    % Power (Right side)
+    \node[power, right=of esp] (mb102) {MB102 Power\\(5V/3.3V)};
+
+    % Connections with Protocol Labels
+    \path[line] (esp) -- node[left, font=\scriptsize] {I2C} (bme);
+    \path[line] (sharp.south) -- node[left, font=\scriptsize] {ADC / GPIO} (esp.north-west);
+    \path[line] (mq135.south) -- node[right, font=\scriptsize] {Analog} (esp.north-east);
+    
+    \path[line] (esp) -- node[right, font=\scriptsize] {SPI} (lcd);
+    \path[line] (esp.south-west) -- node[above, font=\scriptsize] {GPIO} (buzzer.east);
+    \path[line] (esp.south-east) -- node[above, font=\scriptsize] {GPIO} (led.west);
+    
+    % Power connections
+    \path[draw, dashed, red, thick, ->] (mb102.north) |- node[above, pos=0.8, font=\scriptsize] {5V/3.3V} (mq135.east);
+    \path[draw, dashed, red, thick, ->] (mb102.north) |- node[above, pos=0.8, font=\scriptsize] {5V} (sharp.east);
+    \path[draw, dashed, red, thick, ->] (mb102.south) |- node[below, pos=0.8, font=\scriptsize] {3.3V} (lcd.east);
+    \path[draw, dashed, black, thick] (mb102.west) -- node[above, font=\scriptsize] {GND chung} (esp.east);
+
+\end{tikzpicture}
+\caption{Sơ đồ UML Component mối quan hệ phần cứng và giao thức}
+\label{fig:hardware_components}
+\end{figure}
+
 \newpage
 
 % --- CHƯƠNG 3 ---
@@ -214,7 +265,16 @@ Trong đó $\sigma$ là hàm sigmoid, $\circ$ biểu thị phép nhân Hadamard 
 
 Mô hình AI nhúng trong hệ thống có Input Shape là $[1, 24, 4]$: 24 bước thời gian liên tiếp trong quá khứ trượt dọc, mỗi bước chứa 4 thông số cảm biến môi trường. Đầu ra dự báo của mô hình là nồng độ bụi PM2.5 trong 1 giờ kế tiếp.
 
-\subsection{Lượng tử hóa mô hình (Quantization) và Edge AI}
+\subsection{Ma trận trọng số và Ý nghĩa Edge AI}
+Trong mô hình LSTM thực tế được nhúng, các ma trận trọng số cổng có kích thước phụ thuộc vào số chiều của đặc trưng đầu vào $d = 4$ và số lượng nơ-ron ẩn $h = 32$. Cụ thể, các ma trận $W_f, W_i, W_o, W_c$ có kích thước là $32 \times (32 + 4) = 32 \times 36$, tương đương với $1152$ trọng số cho mỗi cổng. Tổng số tham số của riêng tầng LSTM là $4 \times 1152 = 4608$ trọng số nguyên và $4 \times 32 = 128$ biases. Tầng Dense đầu ra thực hiện phép tính:
+\begin{equation}
+y_{\text{scaled}} = W_d \cdot h_{24} + b_d
+\end{equation}
+với $W_d \in \mathbb{R}^{1 \times 32}$ và $b_d \in \mathbb{R}$. Việc nén ma trận trọng số này thông qua lượng tử hóa INT8 giúp chuyển các phép nhân ma trận số thực chấm động vốn tiêu tốn tài nguyên ALU thành các phép cộng và dịch bit số nguyên (Integer Arithmetic), giảm dung lượng lưu trữ từ $19.2$ KB xuống còn $4.8$ KB cho cấu trúc LSTM mà hầu như không làm sụt giảm độ chính xác dự đoán.
+
+Điện toán biên (Edge AI) loại bỏ hoàn toàn sự phụ thuộc vào kết nối Internet khi thực hiện suy luận. Kể cả khi mất kết nối WiFi, thiết bị ESP32-S3 vẫn chạy độc lập thuật toán để cảnh báo người dùng cục bộ, đảm bảo tính bảo mật và giảm tải băng thông đám mây.
+
+\subsection{Lượng tử hóa mô hình (Quantization)}
 Để chạy được mô hình học sâu trên bộ nhớ khiêm tốn của chip vi điều khiển, kỹ thuật lượng tử hóa sau huấn luyện (Post-Training Quantization) được áp dụng để chuyển đổi các ma trận trọng số từ kiểu số thực $32\text{-bit}$ (Float32) về kiểu số nguyên cực nhẹ $8\text{-bit}$ (INT8):
 \begin{equation}
 q = \text{round}\left(\frac{r}{S}\right) + Z
@@ -227,6 +287,63 @@ Với $r$ là số thực gốc, $q$ là số nguyên thu được, $S$ (Scale) 
 \section{Triển khai Phần mềm trên Thiết bị (Firmware)}
 \subsection{Luồng hoạt động chính của chương trình}
 Khi thiết bị khởi động, hàm `setup()` thực hiện các nhiệm vụ: khởi tạo Serial, cảm biến, WiFi/Firebase và màn hình LCD. Sau đó, nó cấp phát vùng nhớ Tensor Arena cho AI. Trong hàm `loop()`, cứ mỗi 5 giây, thiết bị sẽ đọc dữ liệu cảm biến, đẩy qua bộ lọc dị thường Z-Score, thực hiện chuẩn hóa dữ liệu, đưa vào bộ đệm trượt 24 bước thời gian, chạy suy luận AI bằng interpreter, giải lượng tử hóa kết quả dự báo, rồi hiển thị lên màn hình LCD đồng thời đẩy dữ liệu lên Firebase.
+
+\subsection{Sơ đồ luồng hoạt động phần mềm (UML Activity Diagram)}
+Dưới đây là sơ đồ biểu diễn quy trình xử lý công việc từ lúc khởi động đến vòng lặp đo đạc, suy luận AI và truyền dữ liệu bất đồng bộ (Hình~\ref{fig:activity_flow}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    startstop/.style={draw, rectangle, rounded corners, fill=red!20, minimum width=2.5cm, minimum height=0.7cm, text centered, font=\small},
+    process/.style={draw, rectangle, fill=orange!15, minimum width=3.5cm, minimum height=0.7cm, text centered, font=\small},
+    decision/.style={draw, diamond, fill=green!15, aspect=2, text centered, font=\small, inner sep=1pt},
+    arrow/.style={draw, -latex', thick}
+]
+    % Nodes
+    \node[startstop] (start) {Start / Reset};
+    \node[process, below=of start] (init) {Khởi tạo ngoại vi \& LCD};
+    \node[process, below=of init] (check_boot) {Kiểm tra nút BOOT (3s)};
+    \node[decision, below=of check_boot] (dec_boot) {BOOT nhấn?};
+    \node[process, right=1.5cm of dec_boot] (reset_wifi) {Xóa cài đặt WiFi};
+    \node[process, below=of dec_boot, yshift=-0.5cm] (wifi_conn) {AutoConnect WiFi AP};
+    \node[process, below=of wifi_conn] (tflite_init) {Cấp Arena \& Load Model};
+    
+    % Loop Start
+    \node[process, below=of tflite_init] (read_sensor) {Đọc BME280/GP2Y/MQ135};
+    \node[decision, below=of read_sensor] (dec_noise) {Z-Score > 3.0?};
+    \node[process, right=1cm of dec_noise] (replace_ema) {Lấy $EMA_{t-1}$ thế vào};
+    \node[process, below=of dec_noise, yshift=-0.5cm] (minmax) {MinMaxScaler [0,1]};
+    \node[process, below=of minmax] (infer) {Chạy AI (LSTM INT8)};
+    \node[process, below=of infer] (inverse) {Giải chuẩn hóa ra $y_{raw}$};
+    \node[process, below=of inverse] (display) {Vẽ đệm Sprite lên LCD};
+    \node[process, below=of display] (cloud) {Đẩy Firebase (Real/Hist)};
+    
+    % Connectors
+    \path[arrow] (start) -- (init);
+    \path[arrow] (init) -- (check_boot);
+    \path[arrow] (check_boot) -- (dec_boot);
+    \path[arrow] (dec_boot) -- node[above] {Có} (reset_wifi);
+    \path[arrow] (reset_wifi) |- (wifi_conn);
+    \path[arrow] (dec_boot) -- node[left] {Không} (wifi_conn);
+    \path[arrow] (wifi_conn) -- (tflite_init);
+    \path[arrow] (tflite_init) -- (read_sensor);
+    \path[arrow] (read_sensor) -- (dec_noise);
+    \path[arrow] (dec_noise) -- node[above] {Có} (replace_ema);
+    \path[arrow] (replace_ema) |- (minmax);
+    \path[arrow] (dec_noise) -- node[left] {Không} (minmax);
+    \path[arrow] (minmax) -- (infer);
+    \path[arrow] (infer) -- (inverse);
+    \path[arrow] (inverse) -- (display);
+    \path[arrow] (display) -- (cloud);
+    
+    % Loop back
+    \draw[thick,->] (cloud.south) -- ++(0,-0.5) -| ++(-4,0) |- (read_sensor.west);
+
+\end{tikzpicture}
+\caption{Sơ đồ hoạt động thuật toán phần mềm tại biên}
+\label{fig:activity_flow}
+\end{figure}
 
 \subsection{Cấu hình bộ nhớ PSRAM và khởi tạo mô hình AI}
 Hệ thống sử dụng bộ nhớ ngoài PSRAM $8\text{MB}$ để cấp phát động cho Tensor Arena (vùng nhớ chạy mô hình AI của TensorFlow Lite Micro) tránh gây tràn bộ nhớ tĩnh (RAM nội bộ của ESP32-S3 chỉ có $320\text{KB}$):
@@ -274,6 +391,7 @@ void AppWiFiManager::init() {
             forceReset = true; break;
         }
         delay(100);
+        Serial.print(".");
     }
     if (forceReset) {
         wm.resetSettings(); // Xoa cau hinh WiFi cu
@@ -295,6 +413,43 @@ void AppWiFiManager::init() {
 \section{Giao diện Giám sát trực tuyến (Web Dashboard)}
 \subsection{Kiến trúc Web Dashboard theo phong cách Glassmorphism}
 Trang web giám sát được thiết kế theo xu hướng hiện đại UI Glassmorphism (giao diện kính mờ trên nền gradient tối), sử dụng HTML5, CSS3 và Vanilla JS để đạt hiệu năng tải trang nhanh nhất mà không cần các thư viện nặng nề. Biểu đồ lịch sử được xây dựng bằng Chart.js.
+
+\subsection{Sơ đồ truyền dữ liệu bất đồng bộ (UML Sequence Diagram)}
+Biểu đồ trình tự thể hiện quá trình trao đổi dữ liệu không đồng bộ giữa ESP32, Firebase Cloud và Web Client (Hình~\ref{fig:sequence_flow}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=2.5cm,
+    actor/.style={rectangle, draw, fill=blue!10, minimum width=2.2cm, minimum height=0.8cm, text centered, font=\small},
+    db/.style={cylinder, draw, shape border rotate=90, fill=yellow!15, minimum width=2cm, minimum height=1.2cm, text centered, font=\small},
+    line/.style={draw, ->, >=stealth, thick},
+    dashedline/.style={draw, ->, >=stealth, dashed, thick}
+]
+    % Entities
+    \node[actor] (esp) {ESP32-S3 Device};
+    \node[db, right=3.5cm of esp] (fb) {Firebase Database};
+    \node[actor, right=3.5cm of fb] (web) {Web Client};
+    
+    % Lifelines
+    \draw[thick, dotted] (esp.south) -- ++(0,-7);
+    \draw[thick, dotted] (fb.south) -- ++(0,-7);
+    \draw[thick, dotted] (web.south) -- ++(0,-7);
+    
+    % Sequence messages
+    \draw[line] (esp.south) ++(0,-1) -- node[above, font=\scriptsize] {set() Realtime Sensor Data (5s)} ++(4.7,0);
+    \draw[line] (esp.south) ++(0,-2.2) -- node[above, font=\scriptsize] {push() History Record (60s)} ++(4.7,0);
+    
+    \draw[line] (web.south) ++(0,-3.5) -- node[above, font=\scriptsize] {get() last 30 history records} ++(-4.7,0);
+    \draw[dashedline] (fb.south) ++(0,-4.5) -- node[above, font=\scriptsize] {Return historical data array} ++(4.7,0);
+    
+    \draw[line] (web.south) ++(0,-5.5) -- node[above, font=\scriptsize] {listen() to /sensor and /ai} ++(-4.7,0);
+    \draw[dashedline] (fb.south) ++(0,-6.5) -- node[above, font=\scriptsize] {onValue() push stream updates} ++(4.7,0);
+
+\end{tikzpicture}
+\caption{Sơ đồ UML Sequence truyền nhận dữ liệu qua Firebase Cloud}
+\label{fig:sequence_flow}
+\end{figure}
 
 \subsection{Cơ chế tải trước lịch sử (History Pre-loading)}
 Khi người dùng truy cập trang web và chuyển sang chế độ "Realtime Mode", thay vì vẽ biểu đồ trống từ đầu, mã nguồn JavaScript sẽ chạy một truy vấn một lần duy nhất lên Firebase thông qua lệnh `get` kết hợp các hàm giới hạn chỉ lấy 30 bản ghi cuối cùng của lịch sử:
@@ -338,11 +493,40 @@ Thực tế kiểm tra hiệu năng tính toán thông qua hàm đếm thời gi
 
 \subsection{Thử nghiệm bộ lọc dị thường nhiễu đột biến}
 Để kiểm tra thuật toán phát hiện bất thường Z-Score kết hợp EMA, một nguồn khói bụi mạnh nhân tạo (thổi khói cục bộ trực tiếp) được đưa vào cảm biến bụi:
-*   Màn hình Serial in log: `[⚠️ ANOMALY DETECTED] Sudden PM2.5 spike: 506.6 ug/m3. Filtered out!`.
-*   Giá trị thô (Raw) vọt lên trên biểu đồ của Web Dashboard (Đường màu đỏ), nhưng bộ lọc đã chặn lại thành công và đưa giá trị trơn mịn (Filtered - Đường màu xanh dương) vào mô hình LSTM. AI vẫn đưa ra kết quả dự đoán chính xác, không bị ảnh hưởng bởi nhiễu đột biến.
+\begin{itemize}
+    \item Màn hình Serial in log: `[⚠️ ANOMALY DETECTED] Sudden PM2.5 spike: 506.6 ug/m3. Filtered out!`.
+    \item Giá trị thô (Raw) vọt lên trên biểu đồ của Web Dashboard (Đường màu đỏ), nhưng bộ lọc đã chặn lại thành công và đưa giá trị trơn mịn (Filtered - Đường màu xanh dương) vào mô hình LSTM. AI vẫn đưa ra kết quả dự đoán chính xác, không bị ảnh hưởng bởi nhiễu đột biến.
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \fbox{\begin{minipage}{0.8\textwidth}
+    \centering
+    \vspace{2cm}
+    [Đồ thị thực nghiệm PM2.5 thô vs đã lọc nhiễu lọc bằng Z-Score]
+    \vspace{2cm}
+  \end{minipage}}
+  \caption{Mô tả thực nghiệm: Biểu đồ đường của dữ liệu thô cảm biến (đỏ) chứa các xung nhiễu lớn đột ngột và dữ liệu sau lọc (xanh dương) mịn màng, loại bỏ hoàn toàn dị thường.}
+  \label{fig:chart_experimental}
+\end{figure}
 
 \subsection{Logic kích hoạt còi và đèn cảnh báo}
 Khi mô hình AI đưa ra nồng độ dự đoán trong 1 giờ tới $y_{\text{predicted}} \ge 80.0\ \mu\text{g/m}^3$ (mức không khí xấu gây hại sức khỏe), hệ thống lập tức xuất xung điều khiển còi buzzer bíp bíp theo chu kỳ 1 giây và bật đèn LED đỏ sáng cảnh báo. Điều này giúp hệ thống tự động hóa kích hoạt máy lọc không khí hoặc quạt hút trước khi ô nhiễm thực sự ập đến.
+
+\subsection{Hình ảnh thực tế hệ thống}
+Dưới đây là khu vực dành cho hình ảnh lắp ráp thực tế của sản phẩm hoàn chỉnh để phục vụ đánh giá hội đồng đồ án (Hình~\ref{fig:real_device}).
+
+\begin{figure}[htbp]
+  \centering
+  \fbox{\begin{minipage}{0.6\textwidth}
+    \centering
+    \vspace{3cm}
+    [Ảnh sản phẩm phần cứng thực tế và LCD ST7789]
+    \vspace{3cm}
+  \end{minipage}}
+  \caption{Mô tả thực tế: Hộp mô hình chứa ESP32-S3, cảm biến BME280, Sharp GP2Y1014 nối qua mạch lọc RC, cảm biến MQ135 và màn hình LCD hiển thị giao diện Darkmode Apple Watch.}
+  \label{fig:real_device}
+\end{figure}
 
 \newpage
 

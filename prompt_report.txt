@@ -2,8 +2,9 @@ Hãy đóng vai trò là một Chuyên gia viết tài liệu kỹ thuật và G
 
 Yêu cầu định dạng tài liệu LaTeX:
 - Sử dụng documentclass là [12pt,a4paper]{article}.
-- Khai báo đầy đủ các gói thư viện cần thiết như: utf8 (vietnam), amsmath, amssymb, graphicx, booktabs, listings (để hiển thị code C++), hyperref, geometry (căn lề chuẩn).
+- Khai báo đầy đủ các gói thư viện cần thiết như: utf8 (vietnam), amsmath, amssymb, graphicx, booktabs, listings (để hiển thị code C++), hyperref, geometry (căn lề chuẩn), tikz (để vẽ sơ đồ và UML).
 - Trình bày công thức toán học dưới dạng khối equation hoặc inline math $, cấu trúc bảng biểu khoa học bằng booktabs.
+- Thiết kế các sơ đồ và biểu đồ luồng (UML Activity, Sequence, Component Diagrams) bằng công cụ TikZ trực tiếp trong code LaTeX để hiển thị sắc nét.
 - Chia cấu trúc tài liệu thành các mục rõ ràng gồm: Tóm tắt (Abstract), Mục lục, các Chương (Section) từ 1 đến 7 và Tài liệu tham khảo.
 
 Nội dung chi tiết từng chương cần triển khai sâu sắc dựa trên các thông số kỹ thuật thực tế sau:
@@ -21,11 +22,13 @@ Chương 2: Thiết kế Hệ thống và Sơ đồ Phần cứng (System Hardwa
   + Module nguồn ngoài MB102 5V/3.3V cấp nguồn cho các cảm biến công suất cao (MQ135, Sharp GP2Y1014) để tránh sụt áp ESP32.
 - Sơ đồ đấu nối chi tiết (Pinout Mapping) dạng bảng.
 - Sơ đồ mạch lọc RC bảo vệ cho cảm biến bụi Sharp (Điện trở 150 Ohm và Tụ hóa 220uF).
+- Vẽ biểu đồ UML Component Diagram bằng TikZ mô tả mối quan hệ vật lý và giao thức truyền thông (I2C, SPI, Analog, GPIO) giữa ESP32-S3 và các ngoại vi.
 
 Chương 3: Cơ sở Lý thuyết và Thuật toán (Theoretical Background & Algorithms)
 - Công thức chuẩn hóa MinMaxScaler đưa dữ liệu thô về dải [0, 1] cho mô hình AI và phép biến đổi ngược MinMaxScaler để khôi phục chỉ số PM2.5 dự đoán.
 - Thuật toán lọc nhiễu Anomaly Detection: Z-Score động kết hợp Đường trung bình động lũy thừa (EMA) với hệ số alpha = 0.2 để phát hiện và triệt tiêu các xung nhiễu đột biến cục bộ của cảm biến bụi.
 - Nguyên lý mạng nơ-ron LSTM (Long Short-Term Memory) trong dự báo chuỗi thời gian: Giải thích các cổng Forget gate, Input gate, Cell state, Output gate kèm phương trình toán học cụ thể.
+- Phân tích chi tiết ma trận trọng số (Weights, Biases) trong mô hình LSTM: Cách thức LSTM lưu giữ thông tin dài hạn/ngắn hạn thông qua phép nhân ma trận trọng số cổng ($W_f, W_i, W_o, W_c$). Giải thích ý nghĩa của model AI trong điện toán biên (Edge Computing) và cách nó giúp hệ thống hoạt động tự chủ không cần cloud.
 - Kỹ thuật Edge AI: Quá trình lượng tử hóa sau huấn luyện (Post-Training Quantization) chuyển đổi mô hình từ Float32 sang INT8 để chạy trên ESP32-S3.
 
 Chương 4: Triển khai Phần mềm trên Thiết bị (Firmware)
@@ -34,6 +37,7 @@ Chương 4: Triển khai Phần mềm trên Thiết bị (Firmware)
 - Kỹ thuật vẽ đệm đôi (Double-buffering) dùng TFT_eSprite trên PSRAM của thư viện TFT_eSPI giúp LCD hiển thị mượt mà không chớp nháy.
 - Tích hợp thư viện WiFiManager cho phép cấu hình WiFi động qua cổng AP ("AirQuality_AIoT_Setup"), kết hợp nhấn giữ nút BOOT (GPIO 0) trong 3 giây để reset cấu hình mạng cũ.
 - Cơ chế đồng bộ dữ liệu đa tầng lên Firebase Cloud: Nhánh `/sensor` & `/ai` cập nhật realtime mỗi 5 giây, nhánh `/history` đẩy nhật ký lịch sử định kỳ mỗi 60 giây sử dụng Server Timestamp của Firebase (`.sv: "timestamp"`).
+- Vẽ biểu đồ UML Activity Diagram bằng TikZ mô tả chi tiết luồng xử lý phần mềm của ESP32-S3 từ lúc khởi động, cấu hình WiFi, chạy vòng lặp đọc cảm biến, lọc nhiễu, chạy mô hình AI, cập nhật LCD và đồng bộ Firebase.
 
 Chương 5: Giao diện Giám sát trực tuyến (Web Dashboard)
 - Thiết kế Web theo phong cách hiện đại Glassmorphism (Glass-card, Dark mode), sử dụng HTML/CSS/JS thuần và Chart.js để vẽ đồ thị 3 đường (Raw Sensor, Filtered, AI Forecast).
@@ -42,14 +46,16 @@ Chương 5: Giao diện Giám sát trực tuyến (Web Dashboard)
   + Sắp xếp bố cục linh hoạt Flexbox và Grid (gauges 2x2 trên mobile).
   + Cấu hình Chart.js tự động giãn cách trục X (`autoSkip: true`, `maxTicksLimit: 6`) tránh chồng chéo các mốc thời gian trên điện thoại.
 - Triển khai hosting toàn cầu qua Firebase Hosting CDN miễn phí bảo mật SSL (đường link truy cập: https://air-quality-aiot.web.app).
+- Vẽ biểu đồ UML Sequence Diagram bằng TikZ thể hiện quá trình giao tiếp bất đồng bộ giữa Web Client, Firebase Realtime Database và ESP32-S3.
 
 Chương 6: Kết quả Thực nghiệm và Đánh giá (Experimental Results)
 - Trình bày kết quả thời gian suy luận (Inference time) thực tế đo được trên ESP32-S3 là: 216 ms.
 - Trình bày kịch bản kiểm thử tính năng lọc nhiễu: Đưa xung nhiễu PM2.5 ngẫu nhiên vọt lên 500 ug/m3, hệ thống kích hoạt Z-Score phát hiện Anomaly, vẽ badge nháy đỏ "SPIKE FILTERED" trên màn hình và web dashboard, đồng thời lấy EMA thay thế làm đầu vào cho AI để đảm bảo dự báo không bị sai lệch.
 - Trình bày logic điều khiển còi Buzzer khi AI dự báo ô nhiễm (Predicted PM2.5 >= 80 ug/m3) còi bíp cảnh báo sớm trong 1 giây để bật máy lọc không khí trước khi bụi tràn vào phòng.
+- Thêm các đoạn hướng dẫn chèn hình ảnh minh họa (Đồ thị thực nghiệm PM2.5 thô vs đã lọc nhiễu, biểu đồ tổn hao huấn luyện Loss, hình ảnh thiết bị thực tế).
 
 Chương 7: Kết luận và Hướng phát triển (Conclusion & Future Work)
 - Tóm tắt các kết quả đạt được của đồ án tốt nghiệp/môn học.
 - Đề xuất các cải tiến tương lai: Tích hợp OTA cập nhật code không dây, sử dụng pin sạc Li-po tích hợp mạch sạc và tối ưu hóa thêm mô hình học sâu.
 
-Hãy viết code LaTeX đầy đủ, chi tiết, văn phong khoa học, logic chặt chẽ, không viết tắt, đầy đủ các phương trình toán học và các bảng biểu định nghĩa thông số đã nêu.
+Hãy viết code LaTeX đầy đủ, chi tiết, văn phong khoa học, logic chặt chẽ, không viết tắt, đầy đủ các phương trình toán học và các sơ đồ TikZ UML chất lượng cao đã nêu.
