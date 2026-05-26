@@ -14,14 +14,9 @@
     <!-- Firebase SDK (Dạng module) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, query, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // BẠN CẦN ĐIỀN THÔNG TIN FIREBASE CỦA BẠN VÀO ĐÂY:
-        const firebaseConfig = {
-            apiKey: "AIzaSy_YOUR_API_KEY_HERE",
-            databaseURL: "https://your-project-id.firebaseio.com/",
-            projectId: "your-project-id"
-        };
+        import firebaseConfig from "./config.js";
 
         // Khởi tạo Firebase
         const app = initializeApp(firebaseConfig);
@@ -31,6 +26,9 @@
         window.firebaseDB = db;
         window.firebaseRef = ref;
         window.firebaseOnValue = onValue;
+        window.firebaseQuery = query;
+        window.firebaseLimitToLast = limitToLast;
+        window.firebaseGet = get;
     </script>
 
     <link rel="stylesheet" href="style.css">

@@ -45,6 +45,13 @@ const airChart = new Chart(ctx, {
         plugins: {
             legend: {
                 position: 'top',
+                labels: {
+                    boxWidth: 12,
+                    font: {
+                        size: 11
+                    },
+                    padding: 8
+                }
             },
             tooltip: {
                 mode: 'index',
@@ -70,6 +77,10 @@ const airChart = new Chart(ctx, {
             x: {
                 grid: {
                     color: 'rgba(255, 255, 255, 0.05)'
+                },
+                ticks: {
+                    maxTicksLimit: 6, // Tránh chồng chéo nhãn thời gian trên mobile
+                    autoSkip: true
                 }
             }
         }
@@ -186,6 +197,47 @@ function setupFirebaseListeners() {
     console.log("Firebase is initialized. Waiting for data...");
     const sensorRef = dbRef(db, 'sensor');
     const aiRef = dbRef(db, 'ai');
+
+    const queryFn = window.firebaseQuery;
+    const limitToLastFn = window.firebaseLimitToLast;
+    const getFn = window.firebaseGet;
+
+    // Load last 30 historical records from Firebase first
+    if (queryFn && limitToLastFn && getFn) {
+        const historyRef = queryFn(dbRef(db, 'history'), limitToLastFn(30));
+        getFn(historyRef).then((snapshot) => {
+            if (modeSwitch.checked) return; // Switched back to demo mode
+            if (snapshot.exists()) {
+                dataHistory.length = 0; // Clear simulated data
+                const historyData = snapshot.val();
+                
+                // Sort keys by timestamp
+                const sortedRecords = Object.values(historyData).sort((a, b) => a.timestamp - b.timestamp);
+                
+                sortedRecords.forEach(r => {
+                    const date = new Date(r.timestamp);
+                    const timeString = date.getHours().toString().padStart(2, '0') + ':' + 
+                                       date.getMinutes().toString().padStart(2, '0') + ':' + 
+                                       date.getSeconds().toString().padStart(2, '0');
+                                       
+                    dataHistory.push({
+                        time: timeString,
+                        raw_pm25: r.raw_pm25 || 0,
+                        filtered_pm25: r.filtered_pm25 || 0,
+                        predicted_pm25: r.predicted_pm25 || 0,
+                        temp: r.temp || 25,
+                        hum: r.hum || 50,
+                        gas: r.gas || 1.0
+                    });
+                });
+                
+                repopulateChartData();
+                updateTableLog();
+            }
+        }).catch(err => {
+            console.error("Error loading Firebase history: ", err);
+        });
+    }
 
     let firebaseTemp = 25, firebaseHum = 50, firebaseGas = 1.0;
     let firebaseRawPm = 0, firebaseFilteredPm = 0, firebasePredictedPm = 0;
