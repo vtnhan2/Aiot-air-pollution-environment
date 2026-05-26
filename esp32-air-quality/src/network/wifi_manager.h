@@ -3,18 +3,16 @@
 
 #include <WiFi.h>
 
-class WiFiManager {
+class AppWiFiManager {
 public:
-    void init(const char* ssid, const char* password);
+    void init();
     void checkConnection();
     bool isConnected();
 
 private:
-    const char* _ssid;
-    const char* _password;
     unsigned long _lastReconnectAttempt = 0;
 };
 
-extern WiFiManager wifiManager;
+extern AppWiFiManager wifiManager;
 
 #endif // WIFI_MANAGER_H

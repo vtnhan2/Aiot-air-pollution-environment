@@ -1,37 +1,46 @@
 #include "wifi_manager.h"
+#include <WiFiManager.h> // tzapu WiFiManager
 
-WiFiManager wifiManager;
+#define PIN_BOOT_BUTTON 0 // Nút BOOT trên kit ESP32-S3
 
-void WiFiManager::init(const char* ssid, const char* password) {
-    _ssid = ssid;
-    _password = password;
-    
-    Serial.printf("\nConnecting to WiFi: %s\n", _ssid);
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(_ssid, _password);
-    
-    int retries = 0;
-    while (WiFi.status() != WL_CONNECTED && retries < 20) {
-        delay(500);
-        Serial.print(".");
-        retries++;
+AppWiFiManager wifiManager;
+
+void AppWiFiManager::init() {
+    ::WiFiManager wm;
+
+    // Timeout cấu hình: Sau 3 phút không thao tác sẽ tự động tắt AP cấu hình để chạy offline
+    wm.setConfigPortalTimeout(180);
+
+    // Kiểm tra xem nút BOOT có được giữ khi khởi động không để xóa sạch cấu hình WiFi cũ
+    pinMode(PIN_BOOT_BUTTON, INPUT_PULLUP);
+    delay(100);
+    if (digitalRead(PIN_BOOT_BUTTON) == LOW) {
+        Serial.println("\n[WiFi] Phát hiện giữ nút BOOT khi khởi động. Đang xóa cấu hình cũ...");
+        wm.resetSettings();
+        delay(1000);
     }
+
+    Serial.println("\n[WiFi] Đang tìm kiếm và kết nối mạng đã lưu...");
     
-    if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("\nWiFi Connected!");
-        Serial.print("IP Address: ");
-        Serial.println(WiFi.localIP());
+    // Tự động kết nối tới WiFi cũ. Nếu không thấy hoặc thất bại, phát AP cấu hình:
+    // Tên mạng AP: "AirQuality_AIoT_Setup", Mật khẩu: "12345678"
+    bool success = wm.autoConnect("AirQuality_AIoT_Setup", "12345678");
+
+    if (!success) {
+        Serial.println("[WiFi] Kết nối thất bại hoặc quá thời gian cấu hình. Chạy ở chế độ offline/giả lập.");
     } else {
-        Serial.println("\nFailed to connect to WiFi. Will retry in background.");
+        Serial.println("[WiFi] Kết nối WiFi thành công!");
+        Serial.print("[WiFi] Địa chỉ IP: ");
+        Serial.println(WiFi.localIP());
     }
 }
 
-void WiFiManager::checkConnection() {
+void AppWiFiManager::checkConnection() {
     if (WiFi.status() != WL_CONNECTED) {
         unsigned long currentMillis = millis();
-        // Try to reconnect every 10 seconds
+        // Tự động kết nối lại mỗi 10 giây nếu mất kết nối
         if (currentMillis - _lastReconnectAttempt >= 10000) {
-            Serial.println("WiFi connection lost. Reconnecting...");
+            Serial.println("[WiFi] Mất kết nối mạng. Đang kết nối lại...");
             WiFi.disconnect();
             WiFi.reconnect();
             _lastReconnectAttempt = currentMillis;
@@ -39,6 +48,6 @@ void WiFiManager::checkConnection() {
     }
 }
 
-bool WiFiManager::isConnected() {
+bool AppWiFiManager::isConnected() {
     return WiFi.status() == WL_CONNECTED;
 }
