@@ -2,9 +2,9 @@
 #include <addons/TokenHelper.h>
 #include <addons/RTDBHelper.h>
 
-// BẠN CẦN ĐIỀN THÔNG TIN FIREBASE CỦA BẠN VÀO ĐÂY:
-#define API_KEY "AIzaSy_YOUR_API_KEY_HERE"
-#define DATABASE_URL "https://your-project-id.firebaseio.com/" 
+#include "config.h"
+#define API_KEY FIREBASE_API_KEY
+#define DATABASE_URL FIREBASE_DATABASE_URL
 
 FirebaseManager firebaseManager;
 
@@ -15,6 +15,7 @@ void FirebaseManager::init() {
     config.api_key = API_KEY;
     config.database_url = DATABASE_URL;
 
+    Serial.println("[DEBUG] FirebaseManager: calling signUp...");
     // Đăng ký ẩn danh
     if (Firebase.signUp(&config, &auth, "", "")) {
         Serial.println("Firebase Auth OK");
@@ -26,19 +27,19 @@ void FirebaseManager::init() {
     // Assign callbacks
     config.token_status_callback = tokenStatusCallback; 
 
+    Serial.println("[DEBUG] FirebaseManager: calling begin...");
     Firebase.begin(&config, &auth);
+    Serial.println("[DEBUG] FirebaseManager: calling reconnectWiFi...");
     Firebase.reconnectWiFi(true);
+    Serial.println("[DEBUG] FirebaseManager::init() complete.");
 }
 
 void FirebaseManager::loop() {
     // Không cần xử lý liên tục trong vòng lặp trừ khi bạn muốn listen data.
 }
 
-void FirebaseManager::sendData(float raw_pm25, float temp, float hum, float pres, float gas, float filtered_pm25, float predicted_pm25) {
+void FirebaseManager::sendData(float raw_pm25, float temp, float hum, float pres, float gas, float filtered_pm25, float predicted_pm25, bool pushToHistory) {
     if (Firebase.ready() && signupOK) {
-        // Tạo đường dẫn với Timestamp (giả lập hoặc dùng NTP)
-        // Hiện tại ta chỉ lưu vào biến "current" để Dashboard đọc liên tục.
-        
         // Gửi Raw Data
         Firebase.RTDB.setFloat(&fbdo, "sensor/raw_pm25", raw_pm25);
         Firebase.RTDB.setFloat(&fbdo, "sensor/temp", temp);
@@ -50,7 +51,30 @@ void FirebaseManager::sendData(float raw_pm25, float temp, float hum, float pres
         Firebase.RTDB.setFloat(&fbdo, "ai/filtered_pm25", filtered_pm25);
         Firebase.RTDB.setFloat(&fbdo, "ai/predicted_pm25", predicted_pm25);
         
-        Serial.println("Firebase: Data uploaded successfully!");
+        Serial.println("Firebase: Current data updated!");
+
+        // Lưu lịch sử nếu được yêu cầu (ví dụ: định kỳ mỗi 1 phút)
+        if (pushToHistory) {
+            FirebaseJson json;
+            json.add("raw_pm25", raw_pm25);
+            json.add("temp", temp);
+            json.add("hum", hum);
+            json.add("pres", pres);
+            json.add("gas", gas);
+            json.add("filtered_pm25", filtered_pm25);
+            json.add("predicted_pm25", predicted_pm25);
+            
+            // Server-side timestamp
+            FirebaseJson ts;
+            ts.add(".sv", "timestamp");
+            json.add("timestamp", ts);
+            
+            if (Firebase.RTDB.pushJSON(&fbdo, "/history", &json)) {
+                Serial.println("Firebase: History log appended successfully!");
+            } else {
+                Serial.printf("Firebase: Failed to append history. Error: %s\n", fbdo.errorReason().c_str());
+            }
+        }
     } else {
         Serial.println("Firebase: Failed to upload data.");
     }

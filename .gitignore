@@ -7,3 +7,5 @@ __pycache__/
 *.DS_Store
 model_data.h
 anomaly_thresholds.h
+esp32-air-quality/src/network/config.h
+web-dashboard/config.js
