@@ -14,7 +14,9 @@
 DisplayManager::DisplayManager() : sprite(&tft) {}
 
 void DisplayManager::begin() {
+    Serial.println("[DEBUG] DisplayManager::begin() started...");
     tft.init();
+    Serial.println("[DEBUG] tft.init() done.");
     tft.setRotation(0); // 0, 1, 2, 3 tùy hướng xoay màn hình lắp thực tế
     
     // Khởi tạo Sprite 240x240 để vẽ đệm (Double-buffering)
@@ -31,6 +33,7 @@ void DisplayManager::begin() {
     
     // Xóa màn hình ban đầu
     tft.fillScreen(TFT_BLACK);
+    Serial.println("[DEBUG] DisplayManager::begin() finished.");
 }
 
 void DisplayManager::updateData(float temp, float hum, float raw_pm25, float filtered_pm25, float predicted_pm25, float gas_volts, bool wifi_connected, bool anomaly) {
