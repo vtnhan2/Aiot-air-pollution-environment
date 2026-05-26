@@ -26,9 +26,20 @@ void AppWiFiManager::init() {
 
     // Kiểm tra xem nút BOOT có được giữ khi khởi động không để xóa sạch cấu hình WiFi cũ
     pinMode(PIN_BOOT_BUTTON, INPUT_PULLUP);
-    delay(100);
-    if (digitalRead(PIN_BOOT_BUTTON) == LOW) {
-        Serial.println("\n[WiFi] Phát hiện giữ nút BOOT khi khởi động. Đang xóa cấu hình cũ...");
+    Serial.print("[WiFi] Đang khởi chạy. Nhấn giữ nút BOOT (GPIO 0) trong 3 giây tới để Reset WiFi: ");
+    bool forceReset = false;
+    for (int i = 0; i < 30; i++) { // 30 * 100ms = 3 giây
+        if (digitalRead(PIN_BOOT_BUTTON) == LOW) {
+            forceReset = true;
+            break;
+        }
+        delay(100);
+        Serial.print(".");
+    }
+    Serial.println();
+
+    if (forceReset) {
+        Serial.println("\n[WiFi] Đã nhận tín hiệu nút BOOT! Đang xóa cấu hình cũ...");
         wm.resetSettings();
         delay(1000);
     }
