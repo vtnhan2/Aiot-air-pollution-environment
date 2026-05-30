@@ -9,553 +9,1349 @@
 \usepackage{geometry}
 \usepackage{color}
 \usepackage{tikz}
-\usetikzlibrary{shapes.geometric, arrows, positioning}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc, shapes.symbols, shapes.misc, shapes.multipart}
 
-% Cấu hình lề trang chuẩn báo cáo
+% ========== CẤU HÌNH TRANG ==========
 \geometry{
     a4paper,
-    total={170mm,257mm},
     left=30mm,
     right=20mm,
     top=25mm,
     bottom=25mm
 }
 
-% Cấu hình hiển thị code C++ đẹp mắt
-\definecolor{dkgreen}{rgb}{0,0.6,0}
+\onehalfspacing
+
+% ========== MÀU SẮC VÀ ĐỊNH DẠNG CODE ==========
+\definecolor{dkgreen}{rgb}{0,0.5,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{codebg}{rgb}{0.96,0.96,0.98}
+\definecolor{codeframe}{rgb}{0.7,0.7,0.85}
 
 \lstset{
     language=C++,
-    frame=tb,
-    aboveskip=3mm,
-    belowskip=3mm,
+    backgroundcolor=\color{codebg},
+    frame=single,
+    rulecolor=\color{codeframe},
+    aboveskip=4mm,
+    belowskip=4mm,
     showstringspaces=false,
     columns=flexible,
     basicstyle={\small\ttfamily},
-    numbers=none,
+    numbers=left,
     numberstyle=\tiny\color{gray},
-    keywordstyle=\color{blue},
-    commentstyle=\color{dkgreen},
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{dkgreen}\itshape,
     stringstyle=\color{mauve},
     breaklines=true,
     breakatwhitespace=true,
-    tabsize=3
+    tabsize=2,
+    captionpos=b
 }
 
+\lstdefinelanguage{JavaScript}{
+    keywords={const, let, var, function, return, if, else, for, forEach, then, async, await, true, false, null},
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]',
+    morestring=[b]"
+}
+
+% ========== CẤU HÌNH HYPERREF ==========
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={Bao cao do an AIoT - Air Quality Edge AI},
+    pdfauthor={Nhom sinh vien},
+    pdfsubject={He thong giam sat va du bao chat luong khong khi su dung Edge AI}
+}
+
+% ========== HEADER / FOOTER ==========
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Hệ thống Giám sát Chất lượng Không khí AIoT}
+\fancyhead[R]{\small Nhóm thực hiện}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ========== BẮT ĐẦU TÀI LIỆU ==========
 \begin{document}
 
-% --- TRANG BÌA ---
+% ========== TRANG BÌA ==========
+\thispagestyle{empty}
 \begin{center}
-    \large BỘ GIÁO DỤC VÀ ĐÀO TẠO \\
-    \large TRƯỜNG ĐẠI HỌC KỸ THUẬT\\
-    \textbf{\large KHOA ĐIỆN TỬ - VIỄN THÔNG / CÔNG NGHỆ THÔNG TIN}\\
-    \end{center}
+    \large BỘ GIÁO DỤC VÀ ĐÀO TẠO \\[0.2cm]
+    \large TRƯỜNG ĐẠI HỌC ABCCCCD \\[0.1cm]
+    \textbf{\large KHOA CÔNG NGHỆ THÔNG TIN}
+\end{center}
 
-\vspace{2.5cm}
+\vspace{1cm}
+
+\vspace{1.5cm}
 
 \begin{center}
     \textbf{\Large BÁO CÁO ĐỒ ÁN MÔN HỌC}\\[0.5cm]
-    \textbf{\huge HỆ THỐNG GIÁM SÁT VÀ DỰ ĐOÁN CHẤT LƯỢNG KHÔNG KHÍ SỬ DỤNG EDGE AI (AIR QUALITY AIOT)}\\
+    \rule{14cm}{1.5pt}\\[0.4cm]
+    \textbf{\LARGE HỆ THỐNG GIÁM SÁT VÀ DỰ ĐOÁN}\\[0.3cm]
+    \textbf{\LARGE CHẤT LƯỢNG KHÔNG KHÍ SỬ DỤNG EDGE AI}\\[0.3cm]
+    \textbf{\Large (AIR QUALITY AIoT)}\\[0.4cm]
+    \rule{14cm}{1.5pt}
 \end{center}
 
-\vspace{3cm}
+\vspace{1.5cm}
 
 \begin{flushright}
-    \textbf{Giảng viên hướng dẫn:} PGS. TS. Nguyễn Văn A\\
-    \textbf{Sinh viên thực hiện:} Võ Thành Nhân\\
-    \textbf{Mã số sinh viên:} N22DCDTxxx\\
-    \textbf{Lớp:} D22CQDT0x-N\\
+    \begin{tabular}{ll}
+        \textbf{Giảng viên hướng dẫn:} & \makebox[5.5cm]{\dotfill} \\[0.3cm]
+    \end{tabular}
 \end{flushright}
 
-\vspace{2.5cm}
+\vspace{0.2cm}
 \begin{center}
-    \large TP. HỒ CHÍ MINH, NĂM 2026
+    \textbf{DANH SÁCH THÀNH VIÊN THỰC HIỆN} \\[0.2cm]
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|c|p{6cm}|c|c|}
+        \hline
+        \textbf{STT} & \hfil \textbf{Họ và tên} \hfil & \textbf{MSSV} & \textbf{Lớp} \\ \hline
+        1 & & & \\ \hline
+        2 & & & \\ \hline
+        3 & & & \\ \hline
+        4 & & & \\ \hline
+    \end{tabular}
+\end{center}
+
+\vspace{1.2cm}
+\begin{center}
+    \large \textbf{TP.\ HỒ CHÍ MINH, NĂM 2026}
 \end{center}
 
 \newpage
+\thispagestyle{empty}
 
-% --- TÓM TẮT ---
-\renewcommand{\abstractname}{Tóm tắt đồ án}
+% ========== TÓM TẮT ==========
+\renewcommand{\abstractname}{\Large Tóm tắt đồ án}
 \begin{abstract}
-Đồ án trình bày việc thiết kế, xây dựng và triển khai hệ thống AIoT giám sát và dự báo chất lượng không khí thời gian thực dựa trên vi điều khiển ESP32-S3 và công nghệ trí tuệ nhân tạo tại biên (Edge AI). Điểm đặc biệt của đồ án là tích hợp bộ lọc dị thường toán học Z-Score \& EMA để xử lý triệt để các xung nhiễu vật lý của cảm biến, đảm bảo tính ổn định đầu vào cho mô hình mạng nơ-ron hồi quy tuần hoàn LSTM (Long Short-Term Memory). Mô hình LSTM sau khi huấn luyện được nén bằng phương pháp lượng tử hóa INT8 (Post-Training Quantization), tích hợp thành công vào phân vùng bộ nhớ PSRAM trên ESP32-S3 sử dụng thư viện TensorFlow Lite Micro, cho thời gian suy luận thực tế đạt $216$ ms. Hệ thống liên tục đồng bộ dữ liệu trạng thái hiện tại lên Firebase Realtime Database theo chu kỳ $5$ giây và đẩy nhật ký lịch sử tích lũy theo chu kỳ $60$ giây. Giao diện Web Dashboard thiết kế theo xu hướng Glassmorphism tối giản và đáp ứng (responsive), tự động nạp trước 30 bản ghi lịch sử giúp biểu đồ không bị gián đoạn khi truy cập từ xa. Kết quả thực nghiệm cho thấy hệ thống hoạt động ổn định, chính xác trong việc phát hiện nhiễu và đưa ra dự báo sớm để tự kích hoạt còi/đèn cảnh báo khi chỉ số bụi vượt ngưỡng an toàn.
+\setlength{\parindent}{1cm}
+\noindent
+Đồ án trình bày quá trình thiết kế, lập trình và triển khai hoàn chỉnh một hệ thống AIoT (Artificial Intelligence of Things) có khả năng giám sát chất lượng không khí đa chỉ số và dự báo nồng độ bụi mịn PM2.5 trong thời gian thực trực tiếp trên vi điều khiển ESP32-S3.
+
+\vspace{0.3cm}
+\noindent
+\textbf{Kiến trúc phần cứng} bao gồm vi điều khiển ESP32-S3-WROOM-1 N16R8 (16~MB Flash, 8~MB PSRAM) làm nhân xử lý trung tâm, phối hợp với ba cảm biến môi trường: BME280 (nhiệt độ, độ ẩm, áp suất khí quyển qua giao tiếp I2C), Sharp GP2Y1014AU0F (nồng độ bụi PM2.5 qua ADC) và MQ135 (khí độc hại và VOCs qua ADC), màn hình IPS ST7789 240$\times$240 px giao tiếp SPI, cùng các cơ cấu cảnh báo vật lý gồm còi buzzer và đèn LED đỏ.
+
+\vspace{0.3cm}
+\noindent
+\textbf{Đóng góp kỹ thuật nổi bật} gồm ba tầng xử lý tích hợp liền mạch: \textit{(1)} Bộ lọc dị thường toán học Z-Score kết hợp Đường trung bình động lũy thừa (EMA, $\alpha = 0{,}2$) loại bỏ các gai nhiễu đột biến từ cảm biến quang học trước khi đưa vào mô hình; \textit{(2)} Mô hình mạng nơ-ron hồi quy LSTM (Long Short-Term Memory) được huấn luyện trên Python và nén bằng kỹ thuật lượng tử hóa sau huấn luyện INT8 (Post-Training Quantization), nhúng thành công vào phân vùng PSRAM với thời gian suy luận thực tế đo được là $\mathbf{216}$~ms mỗi chu kỳ; \textit{(3)} Cơ chế đồng bộ đám mây hai tầng lên Firebase Realtime Database theo chu kỳ $5$~giây (dữ liệu tức thời) và $60$~giây (nhật ký lịch sử).
+
+\vspace{0.3cm}
+\noindent
+\textbf{Giao diện Web Dashboard} được triển khai tại \url{https://air-quality-aiot.web.app} theo phong cách Glassmorphism tối giản, hiển thị đồng thời ba luồng dữ liệu (PM2.5 thô, PM2.5 đã lọc nhiễu và PM2.5 dự báo AI), hỗ trợ tải trước 30 bản ghi lịch sử nhằm đảm bảo biểu đồ liên tục ngay từ thời điểm truy cập. Kết quả thực nghiệm xác nhận hệ thống phát hiện và chặn thành công xung nhiễu PM2.5 lên đến $506{,}6~\mu\text{g/m}^3$ và tự động kích hoạt cảnh báo âm thanh khi mô hình AI dự báo ô nhiễm vượt ngưỡng $80~\mu\text{g/m}^3$.
+
+\vspace{0.3cm}
+\noindent
+\textbf{Từ khóa:} AIoT, Edge AI, ESP32-S3, TensorFlow Lite Micro, LSTM, Z-Score, PM2.5, Firebase, Glassmorphism.
 \end{abstract}
 
 \newpage
 \tableofcontents
 \newpage
 
-% --- CHƯƠNG 1 ---
+% ============================================================
+% CHƯƠNG 1: GIỚI THIỆU CHUNG
+% ============================================================
 \section{Giới thiệu chung}
-\subsection{Đặt vấn đề}
-Hiện nay, sự phát triển nhanh chóng của các khu đô thị và nền công nghiệp sản xuất dẫn đến tình trạng ô nhiễm không khí nghiêm trọng, đặc biệt là sự gia tăng nồng độ các hạt bụi mịn PM2.5 (các hạt có đường kính nhỏ hơn hoặc bằng 2.5 micromet). Các hạt bụi này có khả năng đi sâu vào phế nang phổi và mạch máu, gây ra các bệnh nghiêm trọng về hô hấp, tim mạch và ung thư. 
 
-Phần lớn các trạm quan trắc không khí hiện nay chỉ cung cấp thông số thụ động của hiện tại mà không có khả năng dự đoán xu hướng ô nhiễm trong tương lai gần để người dân chủ động phòng tránh. Hơn nữa, việc thu thập dữ liệu thô từ cảm biến giá rẻ và đẩy toàn bộ lên đám mây (Cloud Computing) để tính toán thường đối mặt với vấn đề độ trễ cao, tiêu tốn băng thông mạng và nguy cơ mất dữ liệu khi mất kết nối Internet. Do đó, việc nghiên cứu một giải pháp tích hợp trí tuệ nhân tạo trực tiếp lên thiết bị biên (Edge AI) để tự xử lý dữ liệu và đưa ra dự báo sớm là hướng đi cấp thiết và có tính thực tiễn cao.
+\subsection{Đặt vấn đề}
+
+Trong bối cảnh đô thị hóa và công nghiệp hóa diễn ra với tốc độ nhanh chóng, ô nhiễm không khí đang trở thành một trong những mối đe dọa sức khỏe cộng đồng nghiêm trọng nhất tại Việt Nam và trên toàn thế giới. Đặc biệt, các hạt bụi mịn PM2.5 -- được định nghĩa là các hạt lơ lửng có đường kính khí động học nhỏ hơn hoặc bằng $2{,}5$ micromet -- có khả năng xuyên qua hệ thống lọc của mũi và họng người, đi sâu vào phế nang phổi và thậm chí thâm nhập vào mạch máu. Phơi nhiễm dài hạn với PM2.5 được Tổ chức Y tế Thế giới (WHO) ghi nhận là nguyên nhân trực tiếp gây ra các bệnh về hô hấp mãn tính (viêm phế quản, hen suyễn), bệnh tim mạch và ung thư phổi~\cite{who}. Theo hướng dẫn chất lượng không khí toàn cầu của WHO năm 2021, nồng độ PM2.5 trung bình hàng năm không được vượt quá $5~\mu\text{g/m}^3$, trong khi phần lớn các thành phố lớn tại Việt Nam thường xuyên có chỉ số vượt mức cho phép nhiều lần.
+
+Hiện nay, hầu hết các trạm quan trắc chất lượng không khí trong nước đều hoạt động theo mô hình \textit{thụ động}: chúng chỉ đo đạc và hiển thị giá trị tức thời của các chỉ số môi trường mà không có khả năng phân tích xu hướng hoặc đưa ra cảnh báo sớm về các đợt ô nhiễm sắp xảy ra. Điều này đặt người dùng vào thế bị động, chỉ biết phản ứng sau khi đã tiếp xúc với không khí ô nhiễm.
+
+Ngoài ra, mô hình xử lý dữ liệu tập trung trên đám mây (Cloud Computing) -- nơi dữ liệu thô từ cảm biến được truyền toàn bộ lên máy chủ để phân tích -- đối mặt với nhiều thách thức trong thực tế triển khai tại Việt Nam: độ trễ truyền tin cao (đặc biệt tại các khu vực có kết nối Internet không ổn định), tiêu tốn băng thông, chi phí máy chủ và nguy cơ mất toàn bộ tính năng cảnh báo khi mất kết nối mạng. Hơn nữa, việc truyền liên tục dữ liệu lên đám mây cũng tiềm ẩn rủi ro về bảo mật và quyền riêng tư dữ liệu.
+
+Mặt khác, các cảm biến bụi giá rẻ loại quang học (optical dust sensor) vốn rất nhạy cảm với các tác nhân gây nhiễu cục bộ tạm thời như: khói thuốc lá, bụi đất do quét nhà, dị vật bay ngang qua vùng cảm nhận, hoặc ngay cả hơi nước ngưng tụ. Những gai nhiễu đột biến này nếu không được lọc bỏ trước khi đưa vào mô hình học máy sẽ khiến các dự báo bị sai lệch nghiêm trọng, làm mất đi ý nghĩa của hệ thống cảnh báo.
+
+Do đó, đồ án này đề xuất một giải pháp tích hợp toàn diện: xây dựng thiết bị AIoT nhúng trực tiếp thuật toán lọc nhiễu và mô hình trí tuệ nhân tạo ngay trên vi điều khiển tại biên (Edge AI), đảm bảo thiết bị vẫn hoạt động và cảnh báo tự động ngay cả khi hoàn toàn mất kết nối Internet.
 
 \subsection{Mục tiêu của đồ án}
-Mục tiêu cốt lõi của đồ án này bao gồm:
-\begin{enumerate}
-    \item Thiết kế và chế tạo phần cứng trạm đo giám sát đa chỉ số môi trường (Bụi PM2.5, Khí gas VOCs, Nhiệt độ, Độ ẩm, Áp suất không khí).
-    \item Lập trình bộ lọc toán học Z-Score kết hợp EMA trên vi điều khiển nhằm loại bỏ nhiễu dị thường trước khi đưa vào mô hình dự đoán.
-    \item Chuyển đổi và nhúng thành công mô hình học sâu LSTM (Long Short-Term Memory) đã lượng tử hóa (Quantized INT8) để dự báo nồng độ bụi PM2.5 trong 1 giờ tới ngay trên chip vi điều khiển ESP32-S3.
-    \item Xây dựng hệ thống Cloud Firebase và Web Dashboard hiển thị trực quan dữ liệu thời gian thực và lịch sử, tối ưu trải nghiệm trên thiết bị di động.
+
+Mục tiêu cốt lõi của đồ án bao gồm bốn điểm chính:
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Thiết kế phần cứng trạm đo đa chỉ số:} Chế tạo thiết bị đo đồng thời năm chỉ số môi trường gồm nồng độ bụi PM2.5 (sử dụng cảm biến Sharp GP2Y1014), nồng độ khí gas và VOCs (cảm biến MQ135), nhiệt độ, độ ẩm tương đối và áp suất khí quyển (cảm biến BME280), đồng thời hiển thị kết quả trực tiếp trên màn hình LCD IPS ST7789 tại chỗ.
+
+    \item \textbf{Triển khai thuật toán lọc nhiễu Z-Score+EMA trên vi điều khiển:} Lập trình bộ phát hiện dị thường bằng ngôn ngữ C++ trực tiếp trên ESP32-S3, sử dụng thuật toán Z-Score động kết hợp Đường trung bình động lũy thừa (EMA) để phát hiện và triệt tiêu các gai nhiễu đột biến cục bộ từ cảm biến quang học, đảm bảo đầu vào sạch cho mô hình AI.
+
+    \item \textbf{Nhúng mô hình LSTM lượng tử hóa INT8 chạy tại biên:} Huấn luyện mô hình mạng nơ-ron LSTM trên Python, áp dụng kỹ thuật Post-Training Quantization (INT8) để nén mô hình, rồi tích hợp thành công lên phân vùng PSRAM của ESP32-S3 thông qua thư viện TensorFlow Lite Micro, đạt thời gian suy luận thực tế dưới $250$~ms cho mỗi chu kỳ dự báo.
+
+    \item \textbf{Xây dựng hệ sinh thái Cloud và Web Dashboard:} Thiết lập pipeline đồng bộ dữ liệu lên Firebase Realtime Database và xây dựng giao diện Web Dashboard theo phong cách Glassmorphism, cung cấp khả năng giám sát từ xa đa thiết bị (PC và điện thoại di động) thông qua đường dẫn truy cập công khai bảo mật HTTPS.
 \end{enumerate}
+
+\subsection{Phạm vi và đối tượng nghiên cứu}
+
+Đồ án tập trung nghiên cứu và triển khai trên một thiết bị đơn lẻ, phù hợp để đặt trong môi trường \textit{indoor} (phòng ngủ, văn phòng) hoặc \textit{bán-outdoor} (ban công, hành lang). Đối tượng nghiên cứu chính là chuỗi thời gian (time-series) của các chỉ số môi trường được thu thập với tần suất $5$~giây/mẫu. Mô hình LSTM sử dụng cửa sổ trượt $24$ bước thời gian liên tiếp trong quá khứ (tương đương $2$ phút dữ liệu tích lũy trong điều kiện cảm biến đo liên tục) để dự báo nồng độ PM2.5 trong $1$~giờ tiếp theo.
+
+\textbf{Giới hạn phạm vi:} Đồ án không đề cập đến việc xây dựng mạng lưới nhiều trạm quan trắc phân tán, không thiết kế ứng dụng di động native, và chưa tích hợp module năng lượng pin sạc (hệ thống hiện tại sử dụng nguồn USB/Adapter cố định).
 
 \newpage
 
-% --- CHƯƠNG 2 ---
+% ============================================================
+% CHƯƠNG 2: THIẾT KẾ HỆ THỐNG VÀ SƠ ĐỒ PHẦN CỨNG
+% ============================================================
 \section{Thiết kế Hệ thống và Sơ đồ Phần cứng}
-\subsection{Danh mục thiết bị sử dụng (BOM)}
-Để hệ thống đáp ứng được yêu cầu tính toán nặng của mô hình học sâu ngay tại biên, các linh kiện chất lượng cao đã được lựa chọn cẩn thận theo bảng~\ref{tab:bom}.
 
-\begin{table}[htbp]
+\subsection{Kiến trúc tổng thể hệ thống}
+
+Hệ thống được thiết kế theo mô hình ba tầng kết nối liền mạch với nhau:
+
+\begin{enumerate}
+    \item \textbf{Tầng cảm biến và xử lý biên (Edge Layer):} Vi điều khiển ESP32-S3-WROOM-1 N16R8 là trái tim của hệ thống, điều phối thu thập dữ liệu từ ba cảm biến, thực thi thuật toán lọc nhiễu Z-Score/EMA và chạy suy luận AI bằng TensorFlow Lite Micro, rồi điều khiển các cơ cấu cảnh báo và hiển thị lên màn hình ST7789.
+    \item \textbf{Tầng đám mây (Cloud Layer):} Firebase Realtime Database của Google đóng vai trò trung gian lưu trữ và phân phối dữ liệu theo thời gian thực. Dữ liệu được ESP32 đẩy lên theo hai nhánh: \texttt{/sensor} \& \texttt{/ai} (cập nhật tức thời mỗi 5 giây) và \texttt{/history} (nhật ký tích lũy mỗi 60 giây).
+    \item \textbf{Tầng giao diện người dùng (Presentation Layer):} Web Dashboard được viết bằng HTML/CSS/Vanilla JavaScript và phát hành lên Firebase Hosting, cho phép truy cập giám sát từ xa trên mọi thiết bị có trình duyệt web.
+\end{enumerate}
+
+\subsection{Danh mục thiết bị sử dụng (Bill of Materials)}
+
+Việc lựa chọn linh kiện được cân nhắc kỹ lưỡng để đảm bảo thiết bị đáp ứng đồng thời ba tiêu chí: năng lực tính toán đủ mạnh để chạy mô hình AI, độ chính xác cảm biến đủ cao cho ứng dụng giám sát môi trường, và tổng chi phí hợp lý cho một đồ án môn học. Danh mục linh kiện đầy đủ được trình bày trong Bảng~\ref{tab:bom}.
+
+\begin{table}[H]
   \centering
-  \caption{Danh mục linh kiện chính trong hệ thống}
-    \begin{tabular}{lll}
+  \caption{Danh mục linh kiện chính trong hệ thống (Bill of Materials)}
+  \label{tab:bom}
+  \small
+  \begin{tabular}{p{3.8cm} p{5cm} p{6.5cm}}
     \toprule
-    \textbf{Tên Linh Kiện} & \textbf{Thông số kỹ thuật} & \textbf{Vai trò trong hệ thống} \\
+    \textbf{Linh kiện} & \textbf{Thông số kỹ thuật} & \textbf{Vai trò trong hệ thống} \\
     \midrule
-    ESP32-S3-WROOM-1 & 16MB Flash, 8MB PSRAM & Vi điều khiển trung tâm, chạy AI \\
-    Sharp GP2Y1014AU0F & Cảm biến bụi quang học & Đo nồng độ bụi PM2.5 sơ bộ \\
-    BME280 Sensor & Giao tiếp I2C, đo Temp/Hum/Pres & Cung cấp thuộc tính môi trường đầu vào \\
-    MQ135 Sensor & Cảm biến khí độc hóa bán dẫn & Đo nồng độ khí Gas và VOCs \\
-    ST7789 IPS LCD & 1.54 inch, 240x240 px, SPI & Hiển thị thông số và trạng thái tại chỗ \\
-    Buzzer \& LED & Còi chủ động 5V, LED đỏ 5mm & Cơ cấu phát tín hiệu cảnh báo vật lý \\
-    MB102 Power & Module nguồn Breadboard 5V/3.3V & Cấp nguồn ngoài ổn định cho cảm biến \\
+    ESP32-S3-WROOM-1 (N16R8) & Dual-core Xtensa LX7 240~MHz; 16~MB Flash (QIO); 8~MB PSRAM (OPI) & Vi điều khiển trung tâm: thu thập dữ liệu, lọc nhiễu, chạy mô hình AI, điều khiển ngoại vi và truyền dữ liệu qua WiFi \\
+    \midrule
+    Sharp GP2Y1014AU0F & Cảm biến bụi quang học hồng ngoại; ngõ ra Analog; điện áp hoạt động 5~V DC & Đo nồng độ hạt bụi PM2.5 sơ bộ (chỉ số tương đối), cần mạch lọc RC bảo vệ \\
+    \midrule
+    MQ135 Gas Sensor \& Cảm biến điện trở hóa học (bán dẫn); nhạy với NH\textsubscript{3}, NOx, CO\textsubscript{2}, Benzen; ngõ ra Analog; tiêu thụ dòng $\approx$150~mA (sấy nóng) \& Đo điện áp tương đối của khí độc hại và VOCs, dùng để cảnh báo nguy cơ cháy nổ và ô nhiễm khí \\
+
+    ST7789 IPS LCD & 1,54 inch; độ phân giải $240 \times 240$~px; giao tiếp SPI; tấm nền IPS góc nhìn rộng & Hiển thị Dashboard tại chỗ: chỉ số PM2.5, dự báo AI, nhiệt độ, độ ẩm, trạng thái WiFi và cảnh báo dị thường \\
+    \midrule
+    Còi Buzzer chủ động & Còi active 5~V (KY-012); tần số cộng hưởng $\approx$2,3~kHz & Phát âm thanh cảnh báo theo xung PWM khi AI dự báo ô nhiễm vượt ngưỡng \\
+    \midrule
+    LED đỏ 5~mm & LED thông thường, $V_f \approx 2{,}1$~V; kết hợp điện trở hạn dòng $220~\Omega$ & Đèn báo trạng thái ô nhiễm nghiêm trọng \\
+    \midrule
+    MB102 Power Module & Cấp nguồn $5$~V và $3{,}3$~V; dòng tối đa $700$~mA; kết nối cổng DC Barrel & Cấp nguồn ngoài ổn định, cách ly để tránh sụt áp khi MQ135 sấy nhiệt và cảm biến bụi nháy xung LED \\
     \bottomrule
-    \end{tabular}%
-  \label{tab:bom}%
-\end{table}%
+  \end{tabular}
+\end{table}
 
 \subsection{Mạch lọc thông thấp RC bảo vệ cảm biến bụi Sharp}
-Cảm biến bụi quang học Sharp GP2Y1014 bắt buộc phải kết nối qua một mạch lọc RC (điện trở $150\ \Omega$ và tụ hóa $220\ \mu\text{F}$) để hạn dòng và ổn định điện áp xung cho bóng LED phát hồng ngoại bên trong cảm biến, giảm thiểu sai số đo đạc do nhiễu nguồn:
 
-\begin{verbatim}
-               [ Trở 150 Ohm ]
- 5V (Nguồn) ----[======]-------- Chân 1 (VCC) cảm biến Sharp
-                          |
-                        ===== Tụ Hóa 220uF (Chân dài/Dương)
-                          |
- GND ---------------------*----- Chân 2 (GND) cảm biến Sharp
-                          |
-                          *----- Chân 4 (GND) cảm biến Sharp
-\end{verbatim}
-Các chân điều khiển gồm: Chân 3 (LED) nối thẳng tới chân GPIO 5 của ESP32. Chân 5 (Vo - điện áp ngõ ra analog tỉ lệ với lượng bụi) nối tới chân GPIO 4 của ESP32.
+Cảm biến bụi quang học Sharp GP2Y1014AU0F hoạt động theo nguyên lý: vi điều khiển tạo một xung điều khiển 10~ms lên chân LED (chân số 3), đèn LED hồng ngoại bên trong cảm biến bật sáng và chiếu vào buồng đo. Ánh sáng bị tán xạ bởi hạt bụi tạo ra tín hiệu điện áp tương tự ở chân Vo (chân số 5), vi điều khiển đọc tín hiệu này qua ADC để suy ra nồng độ bụi.
 
-\subsection{Sơ đồ đấu nối chi tiết (Pinout Mapping)}
-Sơ đồ kết nối chân giữa ESP32-S3 và các thiết bị ngoại vi được thiết kế tối ưu, tránh xung đột phần cứng và tận dụng tối đa băng thông Bus như được thể hiện ở bảng~\ref{tab:pinout}.
+Tuy nhiên, theo datasheet của Sharp, bóng LED hồng ngoại bên trong cảm biến yêu cầu dòng đỉnh khá lớn và ổn định trong mỗi xung sáng. Nếu cấp nguồn 5~V trực tiếp không qua lọc, mỗi khi LED bật sẽ gây ra một gai điện áp tức thời trên đường nguồn, ảnh hưởng đến điện áp tham chiếu ADC của ESP32 và gây ra giá trị đo sai. Mạch lọc RC (Bộ lọc thông thấp RC) bắt buộc phải được trang bị với các tham số:
 
-\begin{table}[htbp]
-  \centering
-  \caption{Bảng phân bổ chân GPIO của ESP32-S3}
-    \begin{tabular}{llll}
-    \toprule
-    \textbf{Thiết bị ngoại vi} & \textbf{Chân thiết bị} & \textbf{Chân ESP32-S3} & \textbf{Chế độ / Giao thức} \\
-    \midrule
-    Cảm biến BME280 & SDA / SCL & GPIO 8 / GPIO 9 & I2C Master (Wire) \\
-    Cảm biến GP2Y1014 & Vo (Analog) / LED & GPIO 4 / GPIO 5 & ADC / Output \\
-    Cảm biến MQ135 & AO (Analog Out) & GPIO 1 & ADC (Analog Input) \\
-    Màn hình ST7789 LCD & SDA / SCLK & GPIO 11 / GPIO 12 & SPI Hardware MOSI/SCLK \\
-    Màn hình ST7789 LCD & CS / DC / RST / BL & GPIO 10/13/14/15 & Control / Output PWM \\
-    Còi Buzzer & Chân tín hiệu & GPIO 6 & Digital Output \\
-    LED Cảnh báo & Dương cực & GPIO 7 & Digital Output \\
-    \bottomrule
-    \end{tabular}%
-  \label{tab:pinout}%
-\end{table}%
+\begin{equation}
+    \tau = R \cdot C = 150~\Omega \times 220~\mu\text{F} = 33~\text{ms}
+    \label{eq:rc_filter}
+\end{equation}
 
-\subsection{Khuyến nghị cấp nguồn hệ thống}
-Do cảm biến khí MQ135 có bộ phận sấy nóng bên trong tiêu thụ dòng điện rất lớn (lên tới $150\text{mA}$), đồng thời bóng LED hồng ngoại của cảm biến bụi Sharp liên tục nháy xung dòng cao, việc lấy nguồn $5\text{V}$ trực tiếp từ cổng USB của ESP32 sẽ gây ra sụt áp tức thời, làm vi điều khiển bị khởi động lại ngẫu nhiên. Vì vậy, hệ thống bắt buộc phải sử dụng module nguồn ngoài MB102 cấp điện áp $5\text{V}$ độc lập cho cảm biến và nối chung chân GND với ESP32-S3.
+Hằng số thời gian $\tau = 33$~ms đủ lớn để lọc phẳng các xung nhiễu cao tần trên đường nguồn ($f_{\text{nhiễu}} > 1/\tau \approx 30$~Hz), trong khi vẫn đảm bảo LED đáp ứng đủ nhanh với chu kỳ điều khiển $10$~ms theo yêu cầu datasheet. Sơ đồ đấu dây mạch lọc RC:
 
-\subsection{Sơ đồ cấu trúc phần cứng (UML Component Diagram)}
-Dưới đây là sơ đồ UML Component thể hiện sự kết nối vật lý và giao thức truyền thông giữa ESP32-S3 và các khối cảm biến, hiển thị, nguồn cũng như các cơ cấu cảnh báo thực tế (Hình~\ref{fig:hardware_components}).
-
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-    node distance=1.8cm and 1.5cm,
-    block/.style={rectangle, draw, fill=blue!10, text width=2.8cm, text centered, minimum height=1cm, rounded corners, font=\small},
-    mcu/.style={rectangle, draw, fill=red!15, text width=3.5cm, text centered, minimum height=1.8cm, rounded corners, font=\bfseries},
-    power/.style={rectangle, draw, fill=yellow!15, text width=2.2cm, text centered, minimum height=1cm, rounded corners, font=\small},
-    actuator/.style={rectangle, draw, fill=green!15, text width=2.2cm, text centered, minimum height=1cm, rounded corners, font=\small},
-    line/.style={draw, -latex', thick}
+\begin{tikzpicture}[x=1cm, y=1cm,
+    pwr/.style    ={draw, rectangle, fill=red!15, rounded corners=2pt,
+                    minimum width=1.6cm, minimum height=0.75cm,
+                    text centered, font=\small\bfseries},
+    gndblk/.style ={draw, rectangle, fill=black!12, rounded corners=2pt,
+                    minimum width=1.4cm, minimum height=0.75cm,
+                    text centered, font=\small\bfseries},
+    comp/.style   ={draw, rectangle, fill=yellow!22, rounded corners=2pt,
+                    minimum width=2.2cm, minimum height=0.75cm,
+                    text centered, font=\small},
+    sensorblk/.style={draw, rectangle, fill=blue!15, rounded corners=3pt,
+                    minimum width=3.0cm, minimum height=4.2cm,
+                    text centered, font=\small\bfseries, align=center},
+    gpio/.style   ={draw, rectangle, fill=green!18, rounded corners=2pt,
+                    minimum width=2.0cm, minimum height=0.75cm,
+                    text centered, font=\small},
+    pwrL/.style   ={draw, -latex, thick, red!70},
+    gndL/.style   ={draw, thick, black!50},
+    ctrlL/.style  ={draw, -latex, thick, green!55!black},
+    adcL/.style   ={draw, -latex, thick, blue!65}
 ]
-    % Central MCU
-    \node[mcu] (esp) {ESP32-S3 MCU\\(16MB Flash / 8MB PSRAM)};
-    
-    % Sensors (Top)
-    \node[block, above=of esp] (bme) {BME280\\(Nhiệt/Ẩm/Áp suất)};
-    \node[block, left=of bme] (sharp) {Sharp GP2Y1014\\(Cảm biến Bụi)};
-    \node[block, right=of bme] (mq135) {MQ135\\(Cảm biến Khí độc)};
-    
-    % Actuators & Display (Bottom)
-    \node[block, below=of esp] (lcd) {ST7789 LCD\\(Màn hình hiển thị)};
-    \node[actuator, left=of lcd] (buzzer) {Buzzer (Còi)};
-    \node[actuator, right=of lcd] (led) {Warning LED (Đỏ)};
-    
-    % Power (Right side)
-    \node[power, right=of esp] (mb102) {MB102 Power\\(5V/3.3V)};
+%% --- Sharp GP2Y1014 block ---
+\node[sensorblk] (sharp) at (8.4, 0) {
+    \textbf{Sharp}\\\textbf{GP2Y1014}\\[4pt]
+    {\tiny \textbf{Pin 1} VCC}\\[2pt]
+    {\tiny \textbf{Pin 2} GND}\\[2pt]
+    {\tiny \textbf{Pin 3} LED}\\[2pt]
+    {\tiny \textbf{Pin 4} LED-GND}\\[2pt]
+    {\tiny \textbf{Pin 5} Vo}};
 
-    % Connections with Protocol Labels
-    \path[line] (esp) -- node[left, font=\scriptsize] {I2C} (bme);
-    \path[line] (sharp.south) -- node[left, font=\scriptsize] {ADC / GPIO} (esp.north-west);
-    \path[line] (mq135.south) -- node[right, font=\scriptsize] {Analog} (esp.north-east);
-    
-    \path[line] (esp) -- node[right, font=\scriptsize] {SPI} (lcd);
-    \path[line] (esp.south-west) -- node[above, font=\scriptsize] {GPIO} (buzzer.east);
-    \path[line] (esp.south-east) -- node[above, font=\scriptsize] {GPIO} (led.west);
-    
-    % Power connections
-    \path[draw, dashed, red, thick, ->] (mb102.north) |- node[above, pos=0.8, font=\scriptsize] {5V/3.3V} (mq135.east);
-    \path[draw, dashed, red, thick, ->] (mb102.north) |- node[above, pos=0.8, font=\scriptsize] {5V} (sharp.east);
-    \path[draw, dashed, red, thick, ->] (mb102.south) |- node[below, pos=0.8, font=\scriptsize] {3.3V} (lcd.east);
-    \path[draw, dashed, black, thick] (mb102.west) -- node[above, font=\scriptsize] {GND chung} (esp.east);
+%% --- Pin anchor coordinates on left edge of Sharp block ---
+\coordinate (p1) at (6.9,  1.5);
+\coordinate (p2) at (6.9,  0.75);
+\coordinate (p3) at (6.9,  0.0);
+\coordinate (p4) at (6.9, -0.75);
+\coordinate (p5) at (6.9, -1.5);
+
+%% --- Power components ---
+\node[pwr]    (v5)   at (0.0,  3.2) {5\,V};
+\node[comp]   (res)  at (2.6,  3.2) {R = 150\,$\Omega$};
+\node[comp]   (cap)  at (2.6,  1.7) {C = 220\,$\mu$F};
+\node[gndblk] (gnd)  at (0.0,  0.3) {GND};
+
+%% --- ESP32 GPIO blocks ---
+\node[gpio] (g5) at (0.0,  0.0) {GPIO 5};
+\node[gpio] (g4) at (0.0, -1.5) {GPIO 4};
+\node[draw, rectangle, fill=green!10, rounded corners=3pt,
+      minimum width=2.4cm, minimum height=2.6cm,
+      label={[font=\scriptsize,text=gray!70]below:ESP32-S3}]
+    at (0.0, -0.7) {};
+\node[gpio] (g5b) at (0.0,  0.0) {GPIO 5};
+\node[gpio] (g4b) at (0.0, -1.5) {GPIO 4};
+
+%% --- Wires: 5V -> R ---
+\draw[pwrL] (v5.east) -- (res.west);
+%% R -> junction node at (3.9, 3.2), then down to cap.north
+\draw[pwrL] (res.east) -- ++(1.3, 0);
+\coordinate (junc) at (3.9, 1.5);
+\draw[thick] (3.9, 3.2) -- (junc);
+%% junction -> Pin 1 VCC
+\draw[pwrL] (junc) -- (p1)
+    node[midway, above, font=\scriptsize, text=red!70] {5\,V --- VCC};
+%% junction -> cap
+\draw[thick] (junc) -- (cap.north);
+%% cap -> GND bus
+\draw[gndL] (cap.south) -- (3.9, 0.3);
+%% GND block -> GND bus junction
+\draw[gndL] (gnd.east) -- (3.9, 0.3);
+%% GND bus -> Pin 2
+\draw[gndL] (3.9, 0.75) -- (p2)
+    node[midway, above, font=\scriptsize] {GND};
+%% GND bus -> Pin 4
+\draw[gndL] (3.9, -0.75) -- (p4)
+    node[midway, above, font=\scriptsize] {LED-GND};
+%% vertical segment connecting Pin2 and Pin4 on GND bus
+\draw[gndL] (3.9, 0.75) -- (3.9, -0.75);
+%% GND vertical from cap to common node (0.3)
+\draw[gndL] (3.9, 0.3) -- (3.9, 0.75);
+
+%% --- GPIO 5 -> Pin 3 LED (control) ---
+\draw[ctrlL] (g5b.east) -- (p3)
+    node[midway, above, font=\scriptsize, text=green!55!black] {PWM 10\,ms};
+
+%% --- Pin 5 Vo -> GPIO 4 ADC ---
+\draw[adcL] (p5) -- (g4b.east)
+    node[midway, above, font=\scriptsize, text=blue!65] {ADC (Vo)};
 
 \end{tikzpicture}
-\caption{Sơ đồ UML Component mối quan hệ phần cứng và giao thức}
+\caption{Block Diagram: Mạch lọc RC (R~=~150\,$\Omega$, C~=~220\,$\mu$F, $\tau$~=~33\,ms) bảo vệ cảm biến Sharp GP2Y1014 -- kết nối ESP32-S3}
+\label{fig:sharp_rc_circuit}
+\end{figure}
+
+\subsection{Sơ đồ đấu nối chi tiết (Pinout Mapping)}
+
+Bảng phân bổ chân GPIO của ESP32-S3 được thiết kế để tránh xung đột phần cứng giữa các giao thức và tận dụng tối đa băng thông bus. Cụ thể, các thiết bị SPI được gán vào các chân SPI Hardware (MOSI = GPIO~11, SCLK = GPIO~12) để hỗ trợ DMA tốc độ cao, trong khi I2C sử dụng GPIO~8/9 theo cấu hình mặc định của thư viện Wire trên ESP32-S3. Chi tiết phân bổ chân được trình bày trong Bảng~\ref{tab:pinout}.
+
+\begin{table}[H]
+  \centering
+  \caption{Bảng phân bổ chân GPIO của ESP32-S3-WROOM-1 N16R8}
+  \label{tab:pinout}
+  \small
+  \begin{tabular}{p{3.5cm} p{3.5cm} p{3cm} p{4cm}}
+    \toprule
+    \textbf{Thiết bị ngoại vi} & \textbf{Tín hiệu} & \textbf{GPIO (ESP32-S3)} & \textbf{Giao thức / Chế độ} \\
+    \midrule
+    Cảm biến BME280 & SDA & GPIO 8 & I2C Master -- Wire() \\
+                    & SCL & GPIO 9 & I2C Master -- Wire() \\
+    \midrule
+    Cảm biến Sharp GP2Y1014 & Vo (Analog Out) & GPIO 4 & ADC1 -- Đọc điện áp \\
+                             & LED (Control) & GPIO 5 & Digital Output -- Xung 10~ms \\
+    \midrule
+    Cảm biến MQ135 & AO (Analog Out) & GPIO 1 & ADC1 -- Đọc điện áp \\
+    \midrule
+    Màn hình ST7789 LCD & SDA (MOSI) & GPIO 11 & SPI Hardware MOSI \\
+                        & SCL (SCLK) & GPIO 12 & SPI Hardware Clock \\
+                        & CS (Chip Select) & GPIO 10 & Digital Output \\
+                        & DC (Data/Command) & GPIO 13 & Digital Output \\
+                        & RST (Reset) & GPIO 14 & Digital Output \\
+                        & BLK (Backlight) & GPIO 15 & PWM -- Điều chỉnh độ sáng \\
+    \midrule
+    Còi Buzzer & Tín hiệu & GPIO 6 & Digital Output / PWM tone() \\
+    \midrule
+    LED cảnh báo đỏ & Dương cực (+) & GPIO 7 & Digital Output \\
+    \midrule
+    Nút BOOT (reset WiFi) & Chân ấn & GPIO 0 & Digital Input Pull-up \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Khuyến nghị cấp nguồn hệ thống}
+
+Đây là điểm thiết kế phần cứng cực kỳ quan trọng, thường bị bỏ qua khi thiết kế sơ bộ: cảm biến khí MQ135 có bộ phận sấy nóng điện trở bên trong tiêu thụ dòng điện lên tới $150$~mA liên tục. Đồng thời, bóng LED hồng ngoại của cảm biến bụi Sharp nháy xung dòng cao tần số liên tiếp. Nếu cả hai thiết bị này lấy nguồn $5$~V trực tiếp từ đường VBUS của cổng USB của ESP32 (thường giới hạn $500$~mA), gộp với dòng tiêu thụ của chính ESP32 ($\approx$200--300~mA khi WiFi hoạt động), hệ thống sẽ rất dễ rơi vào trạng thái sụt áp (Brown-out), gây ra hiện tượng ESP32 tự khởi động lại ngẫu nhiên.
+
+Giải pháp bắt buộc là sử dụng Module nguồn MB102 cấp điện áp $5$~V độc lập từ Adapter cắm tường cho MQ135 và mạch lọc RC của cảm biến Sharp, đồng thời nối chung mặt phẳng GND giữa nguồn ngoài và ESP32-S3 để bảo toàn tham chiếu điện áp ADC.
+
+\subsection{Sơ đồ cấu trúc phần cứng (Block Diagram)}
+
+Hình~\ref{fig:hardware_components} thể hiện toàn bộ mối quan hệ vật lý, giao thức truyền thông và đường cấp nguồn giữa ESP32-S3 và các khối chức năng của hệ thống theo dạng Block Diagram chuẩn kỹ thuật.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm,
+    % === Block styles ===
+    sensor/.style={draw, rectangle, fill=blue!12, rounded corners=3pt,
+                   minimum width=2.8cm, minimum height=1.0cm,
+                   text centered, font=\small, align=center},
+    mcu/.style={draw, rectangle, fill=red!12, rounded corners=3pt,
+                minimum width=3.4cm, minimum height=3.2cm,
+                text centered, font=\small\bfseries, align=center},
+    actuator/.style={draw, rectangle, fill=green!18, rounded corners=3pt,
+                     minimum width=2.8cm, minimum height=1.0cm,
+                     text centered, font=\small, align=center},
+    power/.style={draw, rectangle, fill=yellow!25, rounded corners=3pt,
+                  minimum width=2.4cm, minimum height=1.0cm,
+                  text centered, font=\small, align=center},
+    cloud/.style={draw, rectangle, fill=cyan!18, rounded corners=3pt,
+                  minimum width=2.4cm, minimum height=1.0cm,
+                  text centered, font=\small, align=center},
+    sig/.style={draw, -latex, thick},
+    pwr/.style={draw, -latex, thick, dashed, red!70},
+    gnd/.style={draw, thick, dashed, black!50}
+]
+
+% -------- Row 0: Sensors (top) --------
+\node[sensor] (sharp) at (-4, 4.5) {Sharp GP2Y1014\\\textit{Bụi PM2.5}\\{\scriptsize ADC}};
+\node[sensor] (bme)   at ( 0, 4.5) {BME280\\\textit{Nhiệt / Ẩm / Áp}\\{\scriptsize I2C}};
+\node[sensor] (mq135) at ( 4, 4.5) {MQ135\\\textit{Khí độc VOCs}\\{\scriptsize ADC}};
+
+% -------- Row 1: MCU (center) --------
+\node[mcu] (esp) at (0, 1.2)
+    {\textbf{ESP32-S3}\\\textbf{N16R8}\\[3pt]
+     {\scriptsize 16\,MB Flash}\\{\scriptsize 8\,MB PSRAM}\\[3pt]
+     {\scriptsize TFLite Micro}\\{\scriptsize WiFi / BLE}};
+
+% -------- Row 2: Actuators + Display (bottom) --------
+\node[actuator] (buzzer) at (-4, -2.2) {Buzzer\\\textit{Cảnh báo âm}\\{\scriptsize GPIO/PWM}};
+\node[sensor]   (lcd)    at ( 0, -2.2) {ST7789 LCD\\$240{\times}240$\,px\\{\scriptsize SPI}};
+\node[actuator] (led)    at ( 4, -2.2) {LED Đỏ\\\textit{Cảnh báo quang}\\{\scriptsize GPIO}};
+
+% -------- Right: Power --------
+\node[power] (mb102) at (6.2, 1.2) {MB102\\5\,V / 3.3\,V\\{\scriptsize Adapter DC}};
+
+% -------- Left: Cloud --------
+\node[cloud] (firebase) at (-6.2, 1.2) {Firebase\\Realtime DB\\{\scriptsize Cloud}};
+
+% -------- Signal connections: Sensors -> MCU --------
+\draw[sig] (sharp.south) -- ++(0,-0.6) -| (esp.north west)
+    node[pos=0.25, above, font=\scriptsize] {ADC};
+\draw[sig] (bme.south)   -- (esp.north)
+    node[midway, right, font=\scriptsize] {I2C};
+\draw[sig] (mq135.south) -- ++(0,-0.6) -| (esp.north east)
+    node[pos=0.25, above, font=\scriptsize] {ADC};
+
+% -------- Signal connections: MCU -> Actuators --------
+\draw[sig] (esp.south west) -- ++(0,-0.5) -| (buzzer.north)
+    node[pos=0.25, above, font=\scriptsize] {PWM};
+\draw[sig] (esp.south) -- (lcd.north)
+    node[midway, right, font=\scriptsize] {SPI};
+\draw[sig] (esp.south east) -- ++(0,-0.5) -| (led.north)
+    node[pos=0.25, above, font=\scriptsize] {GPIO};
+
+% -------- Power connections --------
+\draw[pwr] (mb102.north) -- ++(0, 1.0) -| (mq135.east)
+    node[pos=0.3, right, font=\scriptsize, text=red!70] {5\,V};
+\draw[pwr] (mb102.north) -- ++(0, 0.5) -- ++(-1.0, 0) -- ++(0, 2.8) -- ++(-4.6,0) -| (sharp.east)
+    node[pos=0.5, above, font=\scriptsize, text=red!70] {5\,V};
+\draw[gnd] (mb102.west) -- (esp.east)
+    node[midway, above, font=\scriptsize] {GND};
+
+% -------- WiFi connection --------
+\draw[sig, dashed, cyan!60] (esp.west) -- (firebase.east)
+    node[midway, above, font=\scriptsize, text=cyan!60] {WiFi / TLS};
+
+\end{tikzpicture}
+\caption{Block Diagram: Kiến trúc kết nối phần cứng và giao thức truyền thông của hệ thống}
 \label{fig:hardware_components}
 \end{figure}
 
 \newpage
 
-% --- CHƯƠNG 3 ---
+% ============================================================
+% CHƯƠNG 3: CƠ SỞ LÝ THUYẾT VÀ THUẬT TOÁN
+% ============================================================
 \section{Cơ sở Lý thuyết và Thuật toán}
-\subsection{Chuẩn hóa dữ liệu (Feature Scaling)}
-Mô hình mạng nơ-ron hồi quy LSTM yêu cầu toàn bộ các đặc trưng đầu vào phải nằm trong dải phân bố $[0, 1]$ để đảm bảo sự hội tụ của hàm mất mát trong quá trình huấn luyện và dự đoán. Hệ thống sử dụng thuật toán chuẩn hóa tuyến tính MinMaxScaler:
-\begin{equation}
-x_{\text{scaled}} = \frac{x - x_{\text{min}}}{x_{\text{max}} - x_{\text{min}}}
-\end{equation}
-Trong đó, các cặp hằng số $[x_{\text{min}}, x_{\text{max}}]$ của 4 thuộc tính bao gồm: PM2.5 $[0, 1000]$, Độ ẩm $[-40, 30]$ (giả lập độ sương), Nhiệt độ $[-20, 45]$, Áp suất $[990, 1050]$.
 
-Sau khi mô hình AI trả về kết quả dự đoán dạng đã chuẩn hóa $y_{\text{scaled}} \in [0, 1]$, hệ thống thực hiện phép toán ngược (Inverse MinMaxScaler) để khôi phục nồng độ bụi thực tế:
+\subsection{Chuẩn hóa dữ liệu đầu vào (Feature Scaling -- MinMaxScaler)}
+
+Các mô hình mạng nơ-ron học sâu, đặc biệt là LSTM, rất nhạy cảm với biên độ của dữ liệu đầu vào. Nếu các đặc trưng có biên độ khác nhau quá lớn (ví dụ: áp suất $\approx 1013$~hPa trong khi PM2.5 $\approx 30$~$\mu$g/m$^3$), gradient trong quá trình huấn luyện sẽ bị thống trị bởi các đặc trưng có giá trị lớn, dẫn đến hội tụ chậm hoặc không hội tụ. Do đó, tất cả dữ liệu đầu vào phải được chuẩn hóa về dải $[0, 1]$ thống nhất bằng thuật toán MinMaxScaler tuyến tính:
+
 \begin{equation}
-y_{\text{raw}} = y_{\text{scaled}} \times (y_{\text{max}} - y_{\text{min}}) + y_{\text{min}}
+    x_{\text{scaled}} = \frac{x - x_{\min}}{x_{\max} - x_{\min}}
+    \label{eq:minmax_scale}
 \end{equation}
 
-\subsection{Thuật toán phát hiện dữ liệu dị thường (Anomaly Detection)}
-Các cảm biến bụi quang học rất nhạy cảm với các nhiễu động cục bộ như khói thuốc lá, dị vật bay ngang qua, hoặc bụi quét nhà tạm thời. Để tránh việc mô hình AI dự báo bị sai lệch bởi các giá trị đột biến tạm thời này, hệ thống áp dụng bộ lọc Z-Score động kết hợp Đường trung bình động lũy thừa (EMA).
+Các cặp hằng số $[x_{\min},\ x_{\max}]$ được xác định cố định dựa trên dải vật lý tối đa thực tế của mỗi đặc trưng và phải \textbf{hoàn toàn đồng bộ} giữa môi trường huấn luyện Python và firmware C++ nhúng trên ESP32. Bảng~\ref{tab:feature_range} trình bày chi tiết các hằng số này, khớp chính xác với mảng \texttt{FEATURE\_MIN[]} và \texttt{FEATURE\_MAX[]} được khai báo trong \texttt{main.cpp}.
 
-Giá trị trung bình động lũy thừa của bụi tại thời điểm $t$ được tính bằng công thức:
+\begin{table}[H]
+    \centering
+    \caption{Hằng số MinMaxScaler đồng bộ giữa Python và C++ Firmware}
+    \label{tab:feature_range}
+    \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Đặc trưng (Feature)} & \textbf{Chỉ số (Index)} & \boldmath$x_{\min}$ & \boldmath$x_{\max}$ & \textbf{Đơn vị} \\
+        \midrule
+        PM2.5 (nồng độ bụi mịn) & 0 & 0,0 & 1000,0 & $\mu$g/m$^3$ \\
+        Độ ẩm / Điểm sương & 1 & --40,0 & 30,0 & \% RH \\
+        Nhiệt độ & 2 & --20,0 & 45,0 & °C \\
+        Áp suất khí quyển & 3 & 990,0 & 1050,0 & hPa \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Sau khi mô hình LSTM thực hiện suy luận và trả về kết quả dự báo dưới dạng chuẩn hóa $y_{\text{scaled}} \in [0, 1]$, hệ thống thực hiện phép biến đổi ngược (Inverse MinMaxScaler) để phục hồi giá trị vật lý thực tế:
+
 \begin{equation}
-EMA_t = \alpha \cdot x_t + (1 - \alpha) \cdot EMA_{t-1}
+    y_{\text{raw}} = y_{\text{scaled}} \times (y_{\max} - y_{\min}) + y_{\min}
+    \label{eq:minmax_inverse}
 \end{equation}
-Với $\alpha = 0.2$ là hệ số làm mượt. Phương sai di động tương ứng:
-\begin{equation}
-Var_t = \alpha \cdot (x_t - EMA_{t-1})^2 + (1 - \alpha) \cdot Var_{t-1}
-\end{equation}
-Độ lệch chuẩn di động: $\sigma_t = \sqrt{Var_t}$. Điểm Z-Score của giá trị đo mới:
-\begin{equation}
-Z_t = \frac{|x_t - EMA_{t-1}|}{\sigma_t}
-\end{equation}
-Nếu điểm $Z_t > 3.0$ (vượt quá 3 lần độ lệch chuẩn, tương ứng độ tin cậy $99.7\%$ theo phân phối chuẩn), hệ thống xác định đây là một gai nhiễu dị thường (Anomaly Spike). Giá trị thô $x_t$ sẽ bị chặn lại và thay thế bằng giá trị lịch sử $EMA_{t-1}$ trước khi đưa vào bộ nhớ đệm của mô hình LSTM.
 
-\subsection{Mạng nơ-ron LSTM (Long Short-Term Memory)}
-LSTM là một biến thể nâng cao của Mạng nơ-ron hồi quy (RNN), giải quyết triệt để vấn đề tiêu biến đạo hàm (vanishing gradient) nhờ cấu trúc các cổng kiểm soát thông tin.
-Cấu trúc toán học của một ô nhớ LSTM gồm:
-\begin{align}
-\text{Cổng quên: } & f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f) \\
-\text{Cổng vào: } & i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i) \\
-\text{Trạng thái ô nhớ tạm: } & \tilde{C}_t = \tanh(W_c \cdot [h_{t-1}, x_t] + b_c) \\
-\text{Cập nhật trạng thái ô nhớ: } & C_t = f_t \circ C_{t-1} + i_t \circ \tilde{C}_t \\
-\text{Cổng ra: } & o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o) \\
-\text{Trạng thái ẩn đầu ra: } & h_t = o_t \circ \tanh(C_t)
-\end{align}
-Trong đó $\sigma$ là hàm sigmoid, $\circ$ biểu thị phép nhân Hadamard (từng phần tử).
+Trong firmware C++, hai phép biến đổi này được hiện thực hóa bằng hàm \texttt{scaleData()} và \texttt{inverseScale()} trong \texttt{main.cpp}. Hàm \texttt{scaleData()} còn tích hợp thêm cơ chế kẹp giá trị (clamping) để xử lý các trường hợp NaN từ cảm biến lỗi:
 
-Mô hình AI nhúng trong hệ thống có Input Shape là $[1, 24, 4]$: 24 bước thời gian liên tiếp trong quá khứ trượt dọc, mỗi bước chứa 4 thông số cảm biến môi trường. Đầu ra dự báo của mô hình là nồng độ bụi PM2.5 trong 1 giờ kế tiếp.
+\begin{lstlisting}[caption={MinMaxScaler normalization and inverse scale functions in firmware C++}, language=C++]
+const float FEATURE_MIN[4] = {0.0f, -40.0f, -20.0f, 990.0f};
+const float FEATURE_MAX[4] = {1000.0f, 30.0f, 45.0f, 1050.0f};
 
-\subsection{Ma trận trọng số và Ý nghĩa Edge AI}
-Trong mô hình LSTM thực tế được nhúng, các ma trận trọng số cổng có kích thước phụ thuộc vào số chiều của đặc trưng đầu vào $d = 4$ và số lượng nơ-ron ẩn $h = 32$. Cụ thể, các ma trận $W_f, W_i, W_o, W_c$ có kích thước là $32 \times (32 + 4) = 32 \times 36$, tương đương với $1152$ trọng số cho mỗi cổng. Tổng số tham số của riêng tầng LSTM là $4 \times 1152 = 4608$ trọng số nguyên và $4 \times 32 = 128$ biases. Tầng Dense đầu ra thực hiện phép tính:
-\begin{equation}
-y_{\text{scaled}} = W_d \cdot h_{24} + b_d
-\end{equation}
-với $W_d \in \mathbb{R}^{1 \times 32}$ và $b_d \in \mathbb{R}$. Việc nén ma trận trọng số này thông qua lượng tử hóa INT8 giúp chuyển các phép nhân ma trận số thực chấm động vốn tiêu tốn tài nguyên ALU thành các phép cộng và dịch bit số nguyên (Integer Arithmetic), giảm dung lượng lưu trữ từ $19.2$ KB xuống còn $4.8$ KB cho cấu trúc LSTM mà hầu như không làm sụt giảm độ chính xác dự đoán.
+// Linear normalization: raw value --> [0, 1]
+float scaleData(float value, int feature_index) {
+    if (isnan(value))
+        value = FEATURE_MIN[feature_index]; // Default to MIN if NaN
+    // Clamp to valid range
+    value = max(value, FEATURE_MIN[feature_index]);
+    value = min(value, FEATURE_MAX[feature_index]);
+    return (value - FEATURE_MIN[feature_index]) /
+           (FEATURE_MAX[feature_index] - FEATURE_MIN[feature_index]);
+}
 
-Điện toán biên (Edge AI) loại bỏ hoàn toàn sự phụ thuộc vào kết nối Internet khi thực hiện suy luận. Kể cả khi mất kết nối WiFi, thiết bị ESP32-S3 vẫn chạy độc lập thuật toán để cảnh báo người dùng cục bộ, đảm bảo tính bảo mật và giảm tải băng thông đám mây.
-
-\subsection{Lượng tử hóa mô hình (Quantization)}
-Để chạy được mô hình học sâu trên bộ nhớ khiêm tốn của chip vi điều khiển, kỹ thuật lượng tử hóa sau huấn luyện (Post-Training Quantization) được áp dụng để chuyển đổi các ma trận trọng số từ kiểu số thực $32\text{-bit}$ (Float32) về kiểu số nguyên cực nhẹ $8\text{-bit}$ (INT8):
-\begin{equation}
-q = \text{round}\left(\frac{r}{S}\right) + Z
-\end{equation}
-Với $r$ là số thực gốc, $q$ là số nguyên thu được, $S$ (Scale) là hệ số co giãn tỉ lệ và $Z$ (Zero-point) là điểm lệch không tuyệt đối. Kích thước file mô hình giảm mạnh từ vài Megabytes xuống còn $256\ \text{KB}$ (trong đó mảng C-array thực tế nhúng vào chỉ nặng ~40KB), giúp chip ESP32-S3 xử lý các phép toán nhân ma trận bằng tập lệnh số nguyên vector tốc độ cao tại biên mà không cần kết nối mạng.
-
-\newpage
-
-% --- CHƯƠNG 4 ---
-\section{Triển khai Phần mềm trên Thiết bị (Firmware)}
-\subsection{Luồng hoạt động chính của chương trình}
-Khi thiết bị khởi động, hàm `setup()` thực hiện các nhiệm vụ: khởi tạo Serial, cảm biến, WiFi/Firebase và màn hình LCD. Sau đó, nó cấp phát vùng nhớ Tensor Arena cho AI. Trong hàm `loop()`, cứ mỗi 5 giây, thiết bị sẽ đọc dữ liệu cảm biến, đẩy qua bộ lọc dị thường Z-Score, thực hiện chuẩn hóa dữ liệu, đưa vào bộ đệm trượt 24 bước thời gian, chạy suy luận AI bằng interpreter, giải lượng tử hóa kết quả dự báo, rồi hiển thị lên màn hình LCD đồng thời đẩy dữ liệu lên Firebase.
-
-\subsection{Sơ đồ luồng hoạt động phần mềm (UML Activity Diagram)}
-Dưới đây là sơ đồ biểu diễn quy trình xử lý công việc từ lúc khởi động đến vòng lặp đo đạc, suy luận AI và truyền dữ liệu bất đồng bộ (Hình~\ref{fig:activity_flow}).
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}[
-    node distance=1.2cm,
-    startstop/.style={draw, rectangle, rounded corners, fill=red!20, minimum width=2.5cm, minimum height=0.7cm, text centered, font=\small},
-    process/.style={draw, rectangle, fill=orange!15, minimum width=3.5cm, minimum height=0.7cm, text centered, font=\small},
-    decision/.style={draw, diamond, fill=green!15, aspect=2, text centered, font=\small, inner sep=1pt},
-    arrow/.style={draw, -latex', thick}
-]
-    % Nodes
-    \node[startstop] (start) {Start / Reset};
-    \node[process, below=of start] (init) {Khởi tạo ngoại vi \& LCD};
-    \node[process, below=of init] (check_boot) {Kiểm tra nút BOOT (3s)};
-    \node[decision, below=of check_boot] (dec_boot) {BOOT nhấn?};
-    \node[process, right=1.5cm of dec_boot] (reset_wifi) {Xóa cài đặt WiFi};
-    \node[process, below=of dec_boot, yshift=-0.5cm] (wifi_conn) {AutoConnect WiFi AP};
-    \node[process, below=of wifi_conn] (tflite_init) {Cấp Arena \& Load Model};
-    
-    % Loop Start
-    \node[process, below=of tflite_init] (read_sensor) {Đọc BME280/GP2Y/MQ135};
-    \node[decision, below=of read_sensor] (dec_noise) {Z-Score > 3.0?};
-    \node[process, right=1cm of dec_noise] (replace_ema) {Lấy $EMA_{t-1}$ thế vào};
-    \node[process, below=of dec_noise, yshift=-0.5cm] (minmax) {MinMaxScaler [0,1]};
-    \node[process, below=of minmax] (infer) {Chạy AI (LSTM INT8)};
-    \node[process, below=of infer] (inverse) {Giải chuẩn hóa ra $y_{raw}$};
-    \node[process, below=of inverse] (display) {Vẽ đệm Sprite lên LCD};
-    \node[process, below=of display] (cloud) {Đẩy Firebase (Real/Hist)};
-    
-    % Connectors
-    \path[arrow] (start) -- (init);
-    \path[arrow] (init) -- (check_boot);
-    \path[arrow] (check_boot) -- (dec_boot);
-    \path[arrow] (dec_boot) -- node[above] {Có} (reset_wifi);
-    \path[arrow] (reset_wifi) |- (wifi_conn);
-    \path[arrow] (dec_boot) -- node[left] {Không} (wifi_conn);
-    \path[arrow] (wifi_conn) -- (tflite_init);
-    \path[arrow] (tflite_init) -- (read_sensor);
-    \path[arrow] (read_sensor) -- (dec_noise);
-    \path[arrow] (dec_noise) -- node[above] {Có} (replace_ema);
-    \path[arrow] (replace_ema) |- (minmax);
-    \path[arrow] (dec_noise) -- node[left] {Không} (minmax);
-    \path[arrow] (minmax) -- (infer);
-    \path[arrow] (infer) -- (inverse);
-    \path[arrow] (inverse) -- (display);
-    \path[arrow] (display) -- (cloud);
-    
-    % Loop back
-    \draw[thick,->] (cloud.south) -- ++(0,-0.5) -| ++(-4,0) |- (read_sensor.west);
-
-\end{tikzpicture}
-\caption{Sơ đồ hoạt động thuật toán phần mềm tại biên}
-\label{fig:activity_flow}
-\end{figure}
-
-\subsection{Cấu hình bộ nhớ PSRAM và khởi tạo mô hình AI}
-Hệ thống sử dụng bộ nhớ ngoài PSRAM $8\text{MB}$ để cấp phát động cho Tensor Arena (vùng nhớ chạy mô hình AI của TensorFlow Lite Micro) tránh gây tràn bộ nhớ tĩnh (RAM nội bộ của ESP32-S3 chỉ có $320\text{KB}$):
-\begin{lstlisting}[caption={Khởi tạo Interpreter và cấp phát Arena trên PSRAM}]
-#include <TensorFlowLite_ESP32.h>
-constexpr int kTensorArenaSize = 2 * 1024 * 1024; // 2MB trong PSRAM
-uint8_t* tensor_arena = nullptr;
-
-void setup() {
-    if (psramFound()) {
-        tensor_arena = (uint8_t*) heap_caps_malloc(kTensorArenaSize, MALLOC_CAP_SPIRAM);
-    }
-    // Khoi tao Interpreter
-    static tflite::MicroInterpreter static_interpreter(
-        model, resolver, tensor_arena, kTensorArenaSize, error_reporter);
-    interpreter = &static_interpreter;
-    interpreter->AllocateTensors();
+// Inverse transform: [0, 1] --> actual physical value
+float inverseScale(float scaled_value, int feature_index) {
+    return scaled_value *
+               (FEATURE_MAX[feature_index] - FEATURE_MIN[feature_index]) +
+           FEATURE_MIN[feature_index];
 }
 \end{lstlisting}
 
-\subsection{Cơ chế Double-buffering trên màn hình LCD ST7789}
-Để giao diện hiển thị mượt mà không bị chớp giật khi cập nhật thông số liên tục, lớp `DisplayManager` sử dụng kỹ thuật vẽ đệm đôi (Double-buffering) bằng cách khởi tạo một Sprite đồ họa trong PSRAM. Mọi thao tác vẽ văn bản, vẽ viền thẻ, vẽ cung đo nhiệt độ đều được thực hiện trên Sprite này trước, sau đó đẩy một lần duy nhất lên màn hình LCD:
-\begin{lstlisting}[caption={Kỹ thuật làm tươi giao diện không chớp bằng Sprite}]
-void DisplayManager::updateData(float temp, float hum, float raw_pm25, float filtered_pm25, float predicted_pm25, float gas_volts, bool wifi, bool anomaly) {
-    sprite.fillSprite(COLOR_BG); // Xoa dem bang mau nen
-    drawHeader(wifi);
-    drawPM25(filtered_pm25, raw_pm25, anomaly);
-    drawAIPrediction(predicted_pm25);
-    drawSubStats(temp, hum, gas_volts);
-    sprite.pushSprite(0, 0); // Day toan bo anh tu RAM len LCD
-}
-\end{lstlisting}
+\subsection{Thuật toán Phát hiện dị thường (Anomaly Detection -- Z-Score + EMA)}
 
-\subsection{Quản lý WiFi động qua WiFiManager và Khôi phục cài đặt}
-Để thiết bị có khả năng thích ứng khi đổi môi trường mạng (từ nhà sang trường học), mã nguồn tích hợp thư viện `WiFiManager` kết hợp giám sát chân nút bấm BOOT (GPIO 0). Nếu phát hiện nút BOOT được nhấn giữ trong vòng 3 giây đầu tiên khởi động, bộ nhớ lưu cấu hình WiFi sẽ bị xóa sạch, bắt buộc mạch phát Access Point cấu hình mạng:
-\begin{lstlisting}[caption={Đoạn mã quản lý cấu hình WiFi động}]
-void AppWiFiManager::init() {
-    ::WiFiManager wm;
-    wm.setConfigPortalTimeout(180);
-    
-    pinMode(PIN_BOOT_BUTTON, INPUT_PULLUP);
-    bool forceReset = false;
-    for (int i = 0; i < 30; i++) {
-        if (digitalRead(PIN_BOOT_BUTTON) == LOW) {
-            forceReset = true; break;
-        }
-        delay(100);
-        Serial.print(".");
-    }
-    if (forceReset) {
-        wm.resetSettings(); // Xoa cau hinh WiFi cu
-    }
-    wm.autoConnect("AirQuality_AIoT_Setup", "12345678");
-}
-\end{lstlisting}
+\subsubsection{Động lực và bài toán đặt ra}
 
-\subsection{Đồng bộ dữ liệu đa tầng lên Firebase Cloud}
-Để tối ưu hóa băng thông mạng và dung lượng lưu trữ trên đám mây, hệ thống phân tách luồng truyền tin thành hai chu kỳ khác nhau:
+Cảm biến bụi quang học Sharp GP2Y1014 hoạt động bằng cách đếm số lượng hạt bụi tán xạ ánh sáng hồng ngoại trong buồng đo. Cơ chế này khiến cảm biến cực kỳ nhạy cảm với bất kỳ tác nhân nào tạo ra mật độ hạt cao đột ngột trong không gian xung quanh: khói thuốc lá thổi thẳng vào cảm biến, bụi đất từ hoạt động quét nhà gần kề, con kiến hay hạt bụi lớn bay ngang qua vùng cảm nhận, hoặc thậm chí hơi nước ngưng tụ. Các tác nhân này tạo ra \textbf{gai nhiễu đột biến (Anomaly Spike)} -- giá trị đọc vọt lên cực cao tức thời (ví dụ: từ $30$ lên $500^{+}$~$\mu$g/m$^3$) rồi trở về bình thường ngay lập tức.
+
+Nếu giá trị gai nhiễu này được đưa trực tiếp vào bộ đệm trượt của LSTM, mô hình sẽ nhận nhầm đây là ô nhiễm thực sự và đưa ra dự báo sai lệch nghiêm trọng trong nhiều chu kỳ tiếp theo (do cơ chế bộ nhớ Cell State của LSTM). Do đó, bộ lọc dị thường là tầng bảo vệ không thể thiếu.
+
+\subsubsection{Nguyên lý hoạt động bộ lọc Z-Score động kết hợp EMA}
+
+Hệ thống sử dụng \textbf{Đường trung bình động lũy thừa (Exponential Moving Average -- EMA)} để xây dựng một đường cơ sở thích nghi (adaptive baseline) liên tục cập nhật theo thời gian:
+
+\begin{equation}
+    \text{EMA}_t = \alpha \cdot x_t + (1 - \alpha) \cdot \text{EMA}_{t-1}
+    \label{eq:ema}
+\end{equation}
+
+Hệ số làm mượt $\alpha = 0{,}2$ (được khai báo trong firmware là \texttt{EMA\_ALPHA = 0.2f}) được chọn để cân bằng giữa khả năng phản ứng nhanh với xu hướng dài hạn thực sự và khả năng kháng nhiễu ngắn hạn. Phương sai di động (Moving Variance) tương ứng được cập nhật song song:
+
+\begin{equation}
+    \text{Var}_t = \alpha \cdot (x_t - \text{EMA}_{t-1})^2 + (1 - \alpha) \cdot \text{Var}_{t-1}
+    \label{eq:moving_variance}
+\end{equation}
+
+Độ lệch chuẩn di động: $\sigma_t = \sqrt{\text{Var}_t}$. Để tránh trường hợp chia cho không khi môi trường ổn định ($\sigma_t \approx 0$), firmware đặt sàn tối thiểu $\sigma_{\min} = 10{,}0~\mu\text{g/m}^3$:
+
+\begin{equation}
+    \sigma_t^{\text{eff}} = \max\left(\sigma_t,\ \sigma_{\min}\right) = \max\left(\sqrt{\text{Var}_t},\ 10{,}0\right)
+    \label{eq:stddev_floor}
+\end{equation}
+
+Điểm Z-Score tuyệt đối của mẫu đo mới $x_t$ so với đường cơ sở:
+
+\begin{equation}
+    Z_t = \frac{\left|x_t - \text{EMA}_{t-1}\right|}{\sigma_t^{\text{eff}}}
+    \label{eq:zscore}
+\end{equation}
+
+\textbf{Quy tắc phán định:}
 \begin{itemize}
-    \item **Realtime Stream (Chu kỳ 5 giây):** Cập nhật ghi đè giá trị tức thời lên các nhánh `sensor/` và `ai/` để ứng dụng web hiển thị các mặt đồng hồ đo trực tiếp không bị trễ.
-    \item **History Log (Chu kỳ 60 giây):** Đẩy dữ liệu thời gian thực tích lũy bằng hàm `pushJSON` vào nhánh `/history`. Mỗi bản ghi chứa thông số đầy đủ và một thẻ timestamp do máy chủ tự động đánh mốc thông qua trường cấu trúc đặc biệt của Firebase: `{"timestamp": {".sv": "timestamp"}}`.
+    \item Nếu $Z_t \leq 3{,}0$: Mẫu $x_t$ được xác định là dữ liệu \textbf{bình thường}. Cho phép đi qua và cập nhật EMA, Var theo công thức~\eqref{eq:ema} và~\eqref{eq:moving_variance}.
+    \item Nếu $Z_t > 3{,}0$: Mẫu $x_t$ được xác định là \textbf{gai nhiễu dị thường} (xác suất sai $< 0{,}3\%$ theo phân phối chuẩn). Giá trị thô bị \textbf{chặn lại} và thay thế bằng $\text{EMA}_{t-1}$ trước khi đưa vào bộ đệm LSTM. EMA và Var \textbf{không được cập nhật} để duy trì đường cơ sở ổn định.
+\end{itemize}
+
+Ngưỡng $Z > 3{,}0$ tương ứng với quy tắc $3\sigma$ của phân phối chuẩn Gauss, bao phủ $99{,}7\%$ dữ liệu hợp lệ trong vùng chấp nhận được.
+
+\subsubsection{Hiện thực hóa trong firmware C++}
+
+\begin{lstlisting}[caption={Z-Score + EMA Anomaly Detection filter in main.cpp}, language=C++]
+float ema_pm25 = -1.0f;       // EMA baseline (uninitialized)
+float ema_variance = 0.0f;    // Moving variance (initial value)
+const float EMA_ALPHA = 0.2f; // Smoothing factor
+const float ANOMALY_THRESHOLD_Z = 3.0f; // 3-sigma threshold
+
+bool isAnomaly(float current_pm25) {
+    // First reading: initialize baseline
+    if (ema_pm25 < 0) {
+        ema_pm25 = current_pm25;
+        return false;
+    }
+
+    float diff = current_pm25 - ema_pm25;
+    float stddev = sqrt(ema_variance);
+    if (stddev < 10.0f) stddev = 10.0f; // Minimum floor to prevent division by zero
+
+    float z_score = abs(diff) / stddev;
+
+    if (z_score > ANOMALY_THRESHOLD_Z) {
+        return true; // Anomaly spike detected!
+    }
+
+    // Update EMA and variance only for clean (non-anomaly) readings
+    ema_pm25 = (EMA_ALPHA * current_pm25) + ((1.0f - EMA_ALPHA) * ema_pm25);
+    ema_variance = (EMA_ALPHA * diff * diff) + ((1.0f - EMA_ALPHA) * ema_variance);
+    return false;
+}
+\end{lstlisting}
+
+\subsection{Mạng nơ-ron Hồi quy LSTM (Long Short-Term Memory)}
+
+\subsubsection{Lý do lựa chọn LSTM cho bài toán dự báo chuỗi thời gian}
+
+Dự báo nồng độ ô nhiễm không khí là bài toán dự báo chuỗi thời gian điển hình: giá trị PM2.5 tại thời điểm tương lai phụ thuộc vào lịch sử các giá trị trong quá khứ (mô hình thống kê không gian-thời gian). Các mạng nơ-ron truyền thẳng thông thường (Feedforward Neural Networks) không có cơ chế ghi nhớ, không thể khai thác thông tin phụ thuộc thời gian này. Mạng RNN (Recurrent Neural Network) cơ bản có cơ chế hồi quy nhưng bị giới hạn bởi vấn đề \textit{tiêu biến đạo hàm (Vanishing Gradient)}: gradient bị thu nhỏ theo cấp số nhân qua nhiều bước thời gian, khiến mạng không thể học được các phụ thuộc dài hạn quan trọng (ví dụ: xu hướng tích lũy bụi trong 6 giờ trước đó).
+
+LSTM, được Hochreiter và Schmidhuber đề xuất năm 1997~\cite{lstm}, giải quyết vấn đề này thông qua cơ chế \textbf{Đường dẫn tế bào nhớ (Cell State)} -- một đường truyền gradient thẳng xuyên suốt theo thời gian -- kết hợp với ba cổng kiểm soát thông minh quyết định thông tin nào cần ghi nhớ, quên đi và xuất ra.
+
+\subsubsection{Cấu trúc toán học của một ô nhớ LSTM}
+
+Cho đầu vào tại bước thời gian $t$ là $x_t$, trạng thái ẩn từ bước trước là $h_{t-1}$ và trạng thái ô nhớ từ bước trước là $C_{t-1}$, các phương trình hoạt động của một ô LSTM được định nghĩa như sau:
+
+\begin{align}
+    \text{\textbf{Cổng Quên (Forget Gate):}} \quad & f_t = \sigma\!\left(W_f \cdot [h_{t-1},\ x_t] + b_f\right)
+    \label{eq:forget_gate} \\
+    \text{\textbf{Cổng Vào (Input Gate):}} \quad & i_t = \sigma\!\left(W_i \cdot [h_{t-1},\ x_t] + b_i\right)
+    \label{eq:input_gate} \\
+    \text{\textbf{Trạng thái ô nhớ tạm:}} \quad & \tilde{C}_t = \tanh\!\left(W_c \cdot [h_{t-1},\ x_t] + b_c\right)
+    \label{eq:cell_candidate} \\
+    \text{\textbf{Cập nhật ô nhớ:}} \quad & C_t = f_t \circ C_{t-1} + i_t \circ \tilde{C}_t
+    \label{eq:cell_update} \\
+    \text{\textbf{Cổng Ra (Output Gate):}} \quad & o_t = \sigma\!\left(W_o \cdot [h_{t-1},\ x_t] + b_o\right)
+    \label{eq:output_gate} \\
+    \text{\textbf{Trạng thái ẩn đầu ra:}} \quad & h_t = o_t \circ \tanh(C_t)
+    \label{eq:hidden_state}
+\end{align}
+
+Trong đó: $\sigma$ là hàm sigmoid $\sigma(z) = \frac{1}{1+e^{-z}}$; $\circ$ biểu thị phép nhân phần tử (Hadamard product); $W_f, W_i, W_c, W_o$ là các ma trận trọng số và $b_f, b_i, b_c, b_o$ là các vector độ lệch (bias) tương ứng với bốn cổng.
+
+Trực quan hóa vai trò các cổng: Cổng Quên $f_t$ (giá trị gần 0 -- quên, gần 1 -- giữ) quyết định thông tin dài hạn nào trong Cell State cũ $C_{t-1}$ cần bị xóa đi. Cổng Vào $i_t$ và trạng thái tạm $\tilde{C}_t$ phối hợp xác định thông tin mới từ đầu vào hiện tại $x_t$ sẽ được ghi vào ô nhớ với mức độ bao nhiêu. Cổng Ra $o_t$ quyết định phần nào của ô nhớ hiện tại $C_t$ sẽ được xuất ra thành trạng thái ẩn $h_t$ truyền cho bước tiếp theo.
+
+\subsubsection{Cấu trúc mô hình LSTM nhúng trong hệ thống}
+
+Mô hình AI được nhúng vào ESP32-S3 có kiến trúc tối giản nhưng hiệu quả, phù hợp với tài nguyên phần cứng hạn chế:
+
+\begin{itemize}
+    \item \textbf{Input Shape:} $[1,\ 24,\ 4]$ -- batch size 1, chuỗi 24 bước thời gian liên tiếp, mỗi bước có 4 đặc trưng (PM2.5, Độ ẩm/Điểm sương, Nhiệt độ, Áp suất).
+    \item \textbf{LSTM Layer:} 32 units ẩn (hidden neurons). Các ma trận trọng số cổng $W_f, W_i, W_c, W_o$ có kích thước $32 \times (32 + 4) = 32 \times 36$, tương đương $1152$ trọng số cho mỗi cổng, tổng cộng $4 \times 1152 = 4608$ trọng số và $4 \times 32 = 128$ biases chỉ riêng tầng LSTM.
+    \item \textbf{Dense Output Layer:} 1 nơ-ron, thực hiện phép biến đổi tuyến tính:
+        \begin{equation}
+            y_{\text{scaled}} = W_d \cdot h_{24} + b_d, \quad W_d \in \mathbb{R}^{1 \times 32},\ b_d \in \mathbb{R}
+            \label{eq:dense_output}
+        \end{equation}
+        Đầu ra $y_{\text{scaled}} \in [0, 1]$ là giá trị PM2.5 đã chuẩn hóa, cần áp dụng Inverse MinMaxScaler~\eqref{eq:minmax_inverse} để phục hồi về $\mu$g/m$^3$.
+\end{itemize}
+
+Bộ đệm vòng (Circular Buffer) trong firmware lưu trữ $24 \times 4 = 96$ giá trị lượng tử hóa INT8, được khai báo là \texttt{int8\_t input\_buffer[24][4]}. Mỗi chu kỳ 5 giây, toàn bộ bộ đệm dịch trái 1 bước (mô phỏng cửa sổ trượt), mẫu mới nhất được ghi vào hàng cuối cùng \texttt{input\_buffer[23]}.
+
+\subsection{Lượng tử hóa mô hình (Post-Training Quantization INT8)}
+
+\subsubsection{Sự cần thiết của lượng tử hóa}
+
+Vi điều khiển ESP32-S3, dù là một trong những vi điều khiển mạnh nhất trên thị trường hiện tại, vẫn có những giới hạn tính toán và bộ nhớ căn bản so với máy chủ GPU: không có FPU vector (SIMD) để tính toán số thực dấu phẩy động 32-bit hàng loạt, RAM tích hợp chỉ có $320$~KB. Một mô hình LSTM Float32 thông thường có kích thước $4.8$~KB chỉ cho ma trận trọng số, nhưng khi hoạt động trong TFLite cần thêm bộ nhớ đệm trung gian (activation tensors), tổng Tensor Arena yêu cầu lên tới vài MB. Do đó, lượng tử hóa là bước bắt buộc để mô hình chạy được tại biên.
+
+\subsubsection{Nguyên lý lượng tử hóa INT8 tuyến tính đối xứng}
+
+Lượng tử hóa chuyển đổi mỗi trọng số số thực $r \in \mathbb{R}$ (Float32, 4 byte) thành số nguyên 8-bit $q \in [-128, 127]$ (INT8, 1 byte) thông qua phép ánh xạ tuyến tính có tham số:
+
+\begin{equation}
+    q = \text{clamp}\!\left(\text{round}\!\left(\frac{r}{S}\right) + Z,\ -128,\ 127\right)
+    \label{eq:quantize}
+\end{equation}
+
+Trong đó: $S > 0$ là hệ số tỷ lệ (Scale factor) và $Z$ là điểm không tuyệt đối (Zero-point offset), cả hai được xác định trên mỗi layer từ dữ liệu hiệu chỉnh (calibration dataset). Phép biến đổi ngược tại thời điểm suy luận:
+
+\begin{equation}
+    r \approx S \cdot (q - Z)
+    \label{eq:dequantize}
+\end{equation}
+
+Trong firmware, sau khi \texttt{interpreter->Invoke()} hoàn tất, giá trị đầu ra INT8 cần được giải lượng tử hóa thông qua các tham số \texttt{scale} và \texttt{zero\_point} của tensor đầu ra:
+
+\begin{lstlisting}[caption={Dequantize LSTM output and restore actual PM2.5 value}, language=C++]
+// Read predicted INT8 value from output tensor
+int8_t predicted_val = output->data.int8[0];
+
+// Dequantize: INT8 --> [0, 1] (float32)
+float dequantized_val = (predicted_val - output->params.zero_point)
+                        * output->params.scale;
+
+// Inverse MinMaxScaler: [0,1] --> actual ug/m3
+float final_pm25 = inverseScale(dequantized_val, 0);
+// final_pm25 = predicted PM2.5 concentration for next 1 hour (ug/m3)
+\end{lstlisting}
+
+\subsubsection{Hiệu quả đạt được}
+
+Việc lượng tử hóa toàn bộ mô hình về INT8 mang lại ba lợi ích đồng thời:
+\begin{enumerate}
+    \item \textbf{Giảm bộ nhớ 4 lần:} Mỗi trọng số Float32 (4 byte) được rút gọn xuống INT8 (1 byte). File \texttt{.tflite} từ vài MB giảm xuống còn $\approx 40$~KB cho mảng C-array nhúng trực tiếp vào Flash.
+    \item \textbf{Tăng tốc tính toán:} ESP32-S3 thực hiện phép nhân ma trận số nguyên nhanh hơn đáng kể so với số thực. Thời gian suy luận thực tế chỉ $216$~ms, chiếm chưa đến $5\%$ chu kỳ $5$ giây của vòng lặp chính.
+    \item \textbf{Giảm tiêu thụ năng lượng:} Phép tính số nguyên tiêu tốn ít điện năng hơn phép tính số thực dấu phẩy động.
+\end{enumerate}
+
+\subsection{Ý nghĩa của mô hình Edge AI trong hệ thống}
+
+Điện toán biên (Edge AI) là yếu tố tạo nên sự khác biệt căn bản của hệ thống này so với các thiết bị IoT truyền thống chỉ thu thập và truyền dữ liệu lên đám mây. Khi mô hình LSTM chạy trực tiếp trên ESP32-S3:
+
+\begin{itemize}
+    \item \textbf{Hoạt động độc lập khi mất mạng:} Thiết bị tiếp tục phát hiện dị thường, chạy suy luận AI và kích hoạt còi/đèn cảnh báo ngay cả khi WiFi hoàn toàn mất kết nối. Người dùng tại chỗ vẫn được bảo vệ.
+    \item \textbf{Độ trễ cực thấp:} Suy luận hoàn tất trong $216$~ms ngay tại thiết bị, không có độ trễ mạng $100$--$500$~ms như khi gửi lên đám mây.
+    \item \textbf{Bảo mật dữ liệu:} Dữ liệu cảm biến được xử lý cục bộ, chỉ kết quả tổng hợp (trạng thái hiện tại và dự báo) mới được gửi lên đám mây.
+    \item \textbf{Giảm chi phí đám mây:} Chỉ gửi tối đa một gói dữ liệu nhỏ gọn mỗi 5 giây thay vì luồng dữ liệu thô liên tục.
 \end{itemize}
 
 \newpage
 
-% --- CHƯƠNG 5 ---
-\section{Giao diện Giám sát trực tuyến (Web Dashboard)}
-\subsection{Kiến trúc Web Dashboard theo phong cách Glassmorphism}
-Trang web giám sát được thiết kế theo xu hướng hiện đại UI Glassmorphism (giao diện kính mờ trên nền gradient tối), sử dụng HTML5, CSS3 và Vanilla JS để đạt hiệu năng tải trang nhanh nhất mà không cần các thư viện nặng nề. Biểu đồ lịch sử được xây dựng bằng Chart.js.
+% ============================================================
+% CHƯƠNG 4: TRIỂN KHAI PHẦN MỀM TRÊN THIẾT BỊ (FIRMWARE)
+% ============================================================
+\section{Triển khai Phần mềm trên Thiết bị (Firmware)}
 
-\subsection{Sơ đồ truyền dữ liệu bất đồng bộ (UML Sequence Diagram)}
-Biểu đồ trình tự thể hiện quá trình trao đổi dữ liệu không đồng bộ giữa ESP32, Firebase Cloud và Web Client (Hình~\ref{fig:sequence_flow}).
+\subsection{Cấu trúc dự án và thư viện phụ thuộc}
 
-\begin{figure}[htbp]
+Dự án firmware được tổ chức theo cấu trúc module hóa rõ ràng bằng công cụ PlatformIO, cho phép biên dịch và nạp code hiệu quả:
+
+\begin{lstlisting}[caption={Cấu trúc thư mục dự án firmware (PlatformIO)}, language={}]
+esp32-air-quality/
++-- platformio.ini       # Board config, libraries, build flags
++-- model/               # model_data.cpp  (C-array INT8)
++-- src/
+    +-- main.cpp         # Main loop: AI inference, anomaly detection
+    +-- ai/
+    |   +-- model_data.h # TFLite model array declaration
+    +-- sensors/
+    |   +-- sensor_manager.cpp/h  # BME280, GP2Y1014, MQ135 drivers
+    +-- display/
+    |   +-- display_manager.cpp/h # ST7789 + Sprite double-buffering
+    +-- network/
+        +-- wifi_manager.cpp/h    # WiFiManager + BOOT button reset
+        +-- firebase_manager.cpp/h # Firebase Realtime DB sync
+\end{lstlisting}
+
+Danh sách thư viện bên ngoài (khai báo trong \texttt{platformio.ini}):
+\begin{itemize}
+    \item \texttt{Adafruit BME280 Library \^{}2.2.4}: Driver đọc cảm biến BME280 qua I2C.
+    \item \texttt{Firebase Arduino Client Library \^{}4.4.14}: SDK kết nối Firebase Realtime Database.
+    \item \texttt{TensorFlowLite\_ESP32 \^{}1.0.0}: Thư viện TensorFlow Lite Micro cho ESP32.
+    \item \texttt{TFT\_eSPI \^{}2.5.43}: Driver màn hình ST7789, hỗ trợ SPI DMA và Sprite buffer.
+    \item \texttt{WiFiManager (tzapu)}: Cấu hình WiFi động qua Access Point.
+\end{itemize}
+
+\subsection{Luồng hoạt động chính của chương trình}
+
+\subsubsection{Hàm setup() -- Khởi tạo một lần}
+
+Khi thiết bị cấp nguồn hoặc reset, hàm \texttt{setup()} thực hiện theo trình tự:
+\begin{enumerate}
+    \item Khởi tạo cổng Serial (115200 baud) để in log debug.
+    \item Gọi \texttt{sensorManager.begin()} để khởi tạo bus I2C, cấu hình GPIO cho cảm biến Sharp và MQ135.
+    \item Cấu hình GPIO 6 (Buzzer) và GPIO 7 (LED) là Digital Output và đặt mặc định LOW.
+    \item Gọi \texttt{wifiManager.init()} -- kiểm tra nút BOOT trong 3 giây; nếu bị nhấn, xóa cấu hình WiFi cũ và phát Access Point \texttt{AirQuality\_AIoT\_Setup}.
+    \item Gọi \texttt{firebaseManager.init()} để xác thực với Firebase.
+    \item Gọi \texttt{displayManager.begin()} để khởi tạo ST7789 và cấp phát Sprite buffer trong PSRAM.
+    \item Cấp phát Tensor Arena 2~MB trong PSRAM qua \texttt{heap\_caps\_malloc(MALLOC\_CAP\_SPIRAM)}.
+    \item Nạp mô hình TFLite từ mảng \texttt{model\_data[]}, khởi tạo Resolver, Interpreter và gọi \texttt{AllocateTensors()}.
+\end{enumerate}
+
+\subsubsection{Hàm loop() -- Vòng lặp chính (chu kỳ 5 giây)}
+
+\begin{enumerate}
+    \item Đọc dữ liệu thô từ ba cảm biến thông qua \texttt{sensorManager.readAll()}.
+    \item Kiểm tra gai nhiễu PM2.5 bằng \texttt{isAnomaly()}; nếu phát hiện, thay $x_t$ bằng $\text{EMA}_{t-1}$ và đặt cờ \texttt{anomaly\_detected = true}.
+    \item Dịch bộ đệm trượt sang trái 1 bước (23 bước cũ) và ghi mẫu mới vào \texttt{input\_buffer[23]}.
+    \item Chuẩn hóa 4 đặc trưng bằng \texttt{scaleData()} rồi lượng tử hóa INT8 thông qua tham số tensor \texttt{.scale} và \texttt{.zero\_point}.
+    \item Gọi \texttt{interpreter->Invoke()} để thực hiện suy luận AI (LSTM INT8).
+    \item Giải lượng tử hóa kết quả và áp dụng Inverse MinMaxScaler thu được \texttt{final\_pm25}.
+    \item Cập nhật màn hình LCD thông qua \texttt{displayManager.updateData()}.
+    \item Kiểm tra ngưỡng cảnh báo: nếu \texttt{final\_pm25 >= 80.0} $\mu$g/m$^3$, kích hoạt còi buzzer \texttt{tone(PIN\_BUZZER, 1000, 1000)} và bật LED \texttt{GPIO 7}.
+    \item Đồng bộ dữ liệu lên Firebase theo chu kỳ 5 giây (realtime) và 60 giây (history log).
+\end{enumerate}
+
+\subsection{Sơ đồ hoạt động phần mềm (Flowchart)}
+
+\begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-    node distance=2.5cm,
-    actor/.style={rectangle, draw, fill=blue!10, minimum width=2.2cm, minimum height=0.8cm, text centered, font=\small},
-    db/.style={cylinder, draw, shape border rotate=90, fill=yellow!15, minimum width=2cm, minimum height=1.2cm, text centered, font=\small},
-    line/.style={draw, ->, >=stealth, thick},
-    dashedline/.style={draw, ->, >=stealth, dashed, thick}
+\scalebox{0.82}{
+\begin{tikzpicture}[x=1cm, y=1cm,
+    term/.style   ={draw, rounded rectangle, fill=red!22,
+                    minimum width=3.8cm, minimum height=0.7cm,
+                    text centered, font=\small},
+    proc/.style   ={draw, rectangle, fill=orange!15,
+                    minimum width=4.4cm, minimum height=0.7cm,
+                    text centered, font=\small},
+    dec/.style    ={draw, diamond, fill=green!15, aspect=3.2,
+                    text centered, font=\small, inner sep=1pt},
+    ioblk/.style  ={draw, rectangle, fill=blue!10,
+                    minimum width=4.4cm, minimum height=0.7cm,
+                    text centered, font=\small},
+    arr/.style    ={draw, -latex, thick}
 ]
-    % Entities
-    \node[actor] (esp) {ESP32-S3 Device};
-    \node[db, right=3.5cm of esp] (fb) {Firebase Database};
-    \node[actor, right=3.5cm of fb] (web) {Web Client};
-    
-    % Lifelines
-    \draw[thick, dotted] (esp.south) -- ++(0,-7);
-    \draw[thick, dotted] (fb.south) -- ++(0,-7);
-    \draw[thick, dotted] (web.south) -- ++(0,-7);
-    
-    % Sequence messages
-    \draw[line] (esp.south) ++(0,-1) -- node[above, font=\scriptsize] {set() Realtime Sensor Data (5s)} ++(4.7,0);
-    \draw[line] (esp.south) ++(0,-2.2) -- node[above, font=\scriptsize] {push() History Record (60s)} ++(4.7,0);
-    
-    \draw[line] (web.south) ++(0,-3.5) -- node[above, font=\scriptsize] {get() last 30 history records} ++(-4.7,0);
-    \draw[dashedline] (fb.south) ++(0,-4.5) -- node[above, font=\scriptsize] {Return historical data array} ++(4.7,0);
-    
-    \draw[line] (web.south) ++(0,-5.5) -- node[above, font=\scriptsize] {listen() to /sensor and /ai} ++(-4.7,0);
-    \draw[dashedline] (fb.south) ++(0,-6.5) -- node[above, font=\scriptsize] {onValue() push stream updates} ++(4.7,0);
+% -------- Setup phase (left column) --------
+\node[term]  (start)    at (0, 0)      {Power-on / Reset};
+\node[proc]  (init)     at (0,-1.2)    {Init: Serial, Sensors, GPIO};
+\node[proc]  (boot)     at (0,-2.4)    {Monitor BOOT button (3s)};
+\node[dec]   (dboot)    at (0,-3.8)    {BOOT pressed?};
+\node[proc]  (rwifi)    at (4.2,-3.8)  {Erase WiFi config};
+\node[proc]  (wap)      at (0,-5.2)    {WiFiManager AutoConnect AP};
+\node[proc]  (fbi)      at (0,-6.4)    {Init Firebase Client};
+\node[proc]  (lcdi)     at (0,-7.6)    {Init LCD \& Sprite Buffer};
+\node[proc]  (tfl)      at (0,-8.8)    {Alloc PSRAM 2\,MB; Load TFLite};
+% -------- Loop phase --------
+\node[ioblk] (sens)     at (0,-10.2)   {Read BME280 / GP2Y / MQ135};
+\node[dec]   (dnoise)   at (0,-11.7)   {Z-Score $>3$?};
+\node[proc]  (ema)      at (4.2,-11.7) {Use $\mathrm{EMA}_{t-1}$};
+\node[proc]  (mm)       at (0,-13.1)   {MinMaxScaler $\to[0,1]$};
+\node[proc]  (buf)      at (0,-14.3)   {Shift sliding window (24 steps)};
+\node[proc]  (inf)      at (0,-15.5)   {LSTM INT8 Inference (216\,ms)};
+\node[proc]  (deq)      at (0,-16.7)   {Dequantize + Inverse Scale};
+\node[proc]  (disp)     at (0,-17.9)   {Update LCD Sprite (DMA)};
+\node[dec]   (dalert)   at (0,-19.4)   {PM2.5 forecast $\ge80$?};
+\node[proc]  (alert)    at (4.2,-19.4) {Buzzer + LED ON};
+\node[ioblk] (fb)       at (0,-20.8)   {Firebase: realtime (5s) / history (60s)};
 
+% -------- Arrows --------
+\draw[arr] (start)--(init); \draw[arr] (init)--(boot);
+\draw[arr] (boot)--(dboot);
+\draw[arr] (dboot)-- node[above,font=\scriptsize]{Yes} (rwifi);
+\draw[arr] (rwifi)|-(wap);
+\draw[arr] (dboot)-- node[left,font=\scriptsize]{No} (wap);
+\draw[arr] (wap)--(fbi); \draw[arr] (fbi)--(lcdi);
+\draw[arr] (lcdi)--(tfl); \draw[arr] (tfl)--(sens);
+\draw[arr] (sens)--(dnoise);
+\draw[arr] (dnoise)-- node[above,font=\scriptsize]{Yes} (ema);
+\draw[arr] (ema)|-(mm);
+\draw[arr] (dnoise)-- node[left,font=\scriptsize]{No} (mm);
+\draw[arr] (mm)--(buf); \draw[arr] (buf)--(inf);
+\draw[arr] (inf)--(deq); \draw[arr] (deq)--(disp);
+\draw[arr] (disp)--(dalert);
+\draw[arr] (dalert)-- node[above,font=\scriptsize]{Yes} (alert);
+\draw[arr] (alert)|-(fb);
+\draw[arr] (dalert)-- node[left,font=\scriptsize]{No} (fb);
+% Loop-back
+\draw[arr,rounded corners=6pt]
+    (fb.south)-- ++(0,-0.4)-- ++(-5.2,0)|- (sens.west);
 \end{tikzpicture}
-\caption{Sơ đồ UML Sequence truyền nhận dữ liệu qua Firebase Cloud}
-\label{fig:sequence_flow}
+}
+\caption{Flowchart: Luồng hoạt động phần mềm từ khởi động đến vòng lặp chính}
+\label{fig:activity_flow}
 \end{figure}
 
-\subsection{Cơ chế tải trước lịch sử (History Pre-loading)}
-Khi người dùng truy cập trang web và chuyển sang chế độ "Realtime Mode", thay vì vẽ biểu đồ trống từ đầu, mã nguồn JavaScript sẽ chạy một truy vấn một lần duy nhất lên Firebase thông qua lệnh `get` kết hợp các hàm giới hạn chỉ lấy 30 bản ghi cuối cùng của lịch sử:
-\begin{lstlisting}[caption={Hàm tai truoc lich su tu Firebase ghi vao bieu do}]
-const historyRef = queryFn(dbRef(db, 'history'), limitToLastFn(30));
-getFn(historyRef).then((snapshot) => {
+\subsection{Cấu hình bộ nhớ PSRAM và khởi tạo mô hình TensorFlow Lite Micro}
+
+RAM nội bộ của ESP32-S3 chỉ có $320$~KB, không đủ để lưu Tensor Arena cho mô hình LSTM cùng với các activation buffer trung gian. Hệ thống bắt buộc phải cấp phát động Tensor Arena trên bộ nhớ ngoài PSRAM $8$~MB thông qua hàm \texttt{heap\_caps\_malloc()} với cờ \texttt{MALLOC\_CAP\_SPIRAM}:
+
+\begin{lstlisting}[caption={Allocate Tensor Arena in PSRAM and initialize TFLite Interpreter}, language=C++]
+#include <TensorFlowLite_ESP32.h>
+#include "tensorflow/lite/micro/all_ops_resolver.h"
+#include "tensorflow/lite/micro/micro_interpreter.h"
+
+constexpr int kTensorArenaSize = 2 * 1024 * 1024; // 2 MB in PSRAM
+uint8_t* tensor_arena = nullptr;
+
+// Inside setup():
+tensor_arena = (uint8_t*)heap_caps_malloc(kTensorArenaSize, MALLOC_CAP_SPIRAM);
+if (!tensor_arena) {
+    // Fallback: try allocating in internal RAM (may fail for large size)
+    tensor_arena = (uint8_t*)malloc(kTensorArenaSize);
+}
+
+// Load model from C-array embedded in Flash
+model = tflite::GetModel(model_data);
+
+// Initialize Resolver (register all required ops)
+static tflite::AllOpsResolver resolver;
+static tflite::MicroErrorReporter error_reporter;
+
+// Initialize Interpreter with Arena allocated in PSRAM
+static tflite::MicroInterpreter static_interpreter(
+    model, resolver, tensor_arena, kTensorArenaSize, &error_reporter);
+interpreter = &static_interpreter;
+
+// Allocate memory for all input/output/intermediate tensors
+interpreter->AllocateTensors();
+
+// Get pointers to input and output tensors
+input  = interpreter->input(0);  // Shape: [1, 24, 4], dtype: INT8
+output = interpreter->output(0); // Shape: [1, 1],    dtype: INT8
+\end{lstlisting}
+
+\subsection{Kỹ thuật Double-buffering trên màn hình LCD ST7789}
+
+Giao diện màn hình cần cập nhật liên tục mỗi 5 giây với nhiều thành phần đồ họa: tiêu đề, giá trị PM2.5 lớn, thanh chỉ báo, dự báo AI, nhiệt độ, độ ẩm và biểu tượng trạng thái WiFi. Nếu vẽ trực tiếp từng phần lên màn hình theo thứ tự, người dùng sẽ thấy màn hình cập nhật từng phần một, gây hiệu ứng \textit{chớp (flickering)} rõ ràng và làm giảm tính chuyên nghiệp của giao diện.
+
+Giải pháp \textbf{Double-buffering} sử dụng đối tượng \texttt{TFT\_eSprite} của thư viện TFT\_eSPI: toàn bộ khung hình mới được vẽ vào một vùng nhớ ảo (Sprite) trong PSRAM trước, sau đó đẩy toàn bộ Sprite lên màn hình vật lý trong một thao tác DMA duy nhất cực nhanh (không thấy được bởi mắt người):
+
+\begin{lstlisting}[caption={Flicker-free LCD update using Sprite Double-buffering technique}, language=C++]
+void DisplayManager::updateData(float temp, float hum, float raw_pm25,
+    float filtered_pm25, float predicted_pm25, float gas_volts,
+    bool wifi_connected, bool anomaly) {
+
+    // === PHASE 1: Draw entire new frame into Sprite (in PSRAM) ===
+    sprite.fillSprite(COLOR_BG); // Clear sprite with background color
+    drawHeader(wifi_connected);            // Draw header + WiFi icon
+    drawPM25Card(filtered_pm25, raw_pm25, anomaly); // PM2.5 gauge card
+    drawAIPredictionCard(predicted_pm25);            // AI forecast card
+    drawEnvironmentStats(temp, hum, gas_volts);      // Temp, Hum, Gas
+
+    // === PHASE 2: Push entire Sprite from PSRAM to LCD at once (DMA) ===
+    // This transfer is so fast that no flickering is visible to human eye
+    sprite.pushSprite(0, 0);
+}
+\end{lstlisting}
+
+\subsection{Quản lý WiFi động với WiFiManager và cơ chế khôi phục cấu hình}
+
+Để thiết bị có thể di chuyển giữa các môi trường mạng khác nhau (nhà riêng, văn phòng, phòng lab) mà không cần nạp lại firmware, hệ thống tích hợp thư viện \texttt{WiFiManager}. Cơ chế hoạt động:
+
+\begin{enumerate}
+    \item Khi khởi động, thiết bị thử kết nối lại mạng WiFi đã lưu trong NVS (Non-Volatile Storage).
+    \item Nếu kết nối thành công: tiếp tục hoạt động bình thường.
+    \item Nếu thất bại hoặc chưa có cấu hình: Phát Access Point \texttt{AirQuality\_AIoT\_Setup} (mật khẩu: \texttt{12345678}) và chờ người dùng truy cập cổng cấu hình web tại \texttt{192.168.4.1} để nhập thông tin WiFi mới.
+    \item Cơ chế reset cấu hình thủ công: nhấn giữ nút BOOT (GPIO~0, mức LOW khi nhấn) trong $3$~giây đầu tiên khởi động để xóa cài đặt WiFi cũ.
+\end{enumerate}
+
+\begin{lstlisting}[caption={Dynamic WiFi management with BOOT button reset in wifi\_manager.cpp}, language=C++]
+void AppWiFiManager::init() {
+    ::WiFiManager wm;
+    wm.setConfigPortalTimeout(180); // AP portal closes after 3 minutes
+
+    // Monitor BOOT button (GPIO 0) for first 3 seconds
+    pinMode(PIN_BOOT_BUTTON, INPUT_PULLUP);
+    bool forceReset = false;
+    for (int i = 0; i < 30; i++) {        // 30 iterations x 100ms = 3 sec
+        if (digitalRead(PIN_BOOT_BUTTON) == LOW) {
+            forceReset = true;
+            break; // BOOT button press detected
+        }
+        delay(100);
+    }
+
+    if (forceReset) {
+        Serial.println("[WiFi] BOOT button held: Resetting WiFi settings...");
+        wm.resetSettings(); // Erase saved WiFi config from NVS
+    }
+
+    // Auto-connect or open configuration AP portal
+    bool connected = wm.autoConnect("AirQuality_AIoT_Setup", "12345678");
+    if (!connected) {
+        Serial.println("[WiFi] Config portal timeout. Restarting...");
+        ESP.restart();
+    }
+    Serial.printf("[WiFi] Connected! IP: %s\n",
+                  WiFi.localIP().toString().c_str());
+}
+\end{lstlisting}
+
+\subsection{Đồng bộ dữ liệu đa tầng lên Firebase Realtime Database}
+
+Để tối ưu hóa dung lượng lưu trữ và băng thông mạng, hệ thống phân tách luồng truyền tin thành hai cấp độ với chu kỳ khác nhau:
+
+\begin{itemize}
+    \item \textbf{Realtime Stream -- Chu kỳ 5 giây:} Ghi đè (overwrite) các giá trị tức thời lên hai nhánh cố định \texttt{/sensor} và \texttt{/ai}. Web Dashboard lắng nghe hai nhánh này bằng \texttt{onValue()} để cập nhật đồng hồ đo và badge trạng thái không bị trễ.
+    \item \textbf{History Log -- Chu kỳ 60 giây:} Gọi \texttt{pushJSON()} để thêm (append) một bản ghi mới vào nhánh \texttt{/history}. Mỗi bản ghi bao gồm đầy đủ 7 trường dữ liệu và trường \texttt{timestamp} đặc biệt sử dụng Server Timestamp của Firebase để đảm bảo thời gian được mốc theo đồng hồ máy chủ Google (không phụ thuộc đồng hồ ESP32 có thể bị lệch):
+\end{itemize}
+
+\begin{lstlisting}[caption={History record format pushed to Firebase with Server Timestamp}, language=C++]
+// JSON structure for one history record pushed to /history
+{
+    "raw_pm25": 45.3,          // Raw PM2.5 from sensor (ug/m3)
+    "filtered_pm25": 43.1,     // PM2.5 after Z-Score/EMA filter (ug/m3)
+    "predicted_pm25": 52.7,    // PM2.5 forecast (next 1 hour) by AI (ug/m3)
+    "temp": 28.5,              // Temperature (Celsius)
+    "hum": 72.3,               // Relative humidity (%)
+    "gas": 1.24,               // MQ135 sensor voltage (Volt)
+    "anomaly": false,          // Was an anomaly spike detected this cycle?
+    "timestamp": {".sv": "timestamp"} // Firebase Server Timestamp
+}
+\end{lstlisting}
+
+\newpage
+
+% ============================================================
+% CHƯƠNG 5: GIAO DIỆN GIÁM SÁT TRỰC TUYẾN (WEB DASHBOARD)
+% ============================================================
+\section{Giao diện Giám sát trực tuyến (Web Dashboard)}
+
+\subsection{Kiến trúc và công nghệ Web Dashboard}
+
+Web Dashboard được xây dựng hoàn toàn bằng công nghệ web tiêu chuẩn không phụ thuộc framework nặng: HTML5, CSS3 thuần và Vanilla JavaScript (ES2020+). Việc không sử dụng các framework front-end như React hay Vue.js là lựa chọn có chủ ý để tối đa hóa tốc độ tải trang (Time-to-Interactive $< 1$~giây qua CDN Firebase) và giảm thiểu kích thước bundle.
+
+Firebase SDK v9 (Modular) được nhúng qua CDN với cách viết theo phong cách tree-shakable, chỉ import đúng các hàm cần thiết (\texttt{getDatabase}, \texttt{ref}, \texttt{onValue}, \texttt{get}, \texttt{limitToLast}, \texttt{query}). Biểu đồ lịch sử được xây dựng bằng Chart.js v4 với ba đường dữ liệu trực quan hóa trên cùng một canvas.
+
+\subsection{Thiết kế giao diện Glassmorphism}
+
+Giao diện được thiết kế theo xu hướng UI hiện đại \textbf{Glassmorphism}: các thẻ nội dung sử dụng hiệu ứng kính mờ (\texttt{backdrop-filter: blur(20px)}) phủ lên nền gradient tối, tạo cảm giác chiều sâu và sang trọng. Các điểm đặc trưng thiết kế:
+
+\begin{itemize}
+    \item Nền trang: Gradient tối hai màu xanh-đen (\texttt{radial-gradient}).
+    \item Thẻ dữ liệu: \texttt{background: rgba(255,255,255,0.08)}, \texttt{backdrop-filter: blur(20px)}, \texttt{border: 1px solid rgba(255,255,255,0.15)}, góc bo \texttt{border-radius: 20px}.
+    \item Màu sắc theo ngưỡng PM2.5: Xanh lá (tốt, $< 12$), vàng (trung bình, $12$--$35$), cam (xấu, $35$--$55$), đỏ (nguy hại, $> 55$).
+    \item Badge nhấp nháy \texttt{[!] ANOMALY DETECTED} với animation \texttt{pulse} khi phát hiện gai nhiễu.
+    \item Font chữ: Google Fonts \texttt{Outfit} -- font sans-serif hiện đại, hỗ trợ đầy đủ ký tự Latin.
+\end{itemize}
+
+\subsection{Thuật toán tải trước lịch sử (History Pre-loading)}
+
+Một trong những trải nghiệm người dùng tốt nhất mà hệ thống cung cấp là biểu đồ lịch sử hiển thị ngay lập tức khi trang web được mở, thay vì phải chờ dữ liệu tích lũy dần. Khi người dùng bật chế độ ``Realtime Mode'', JavaScript thực hiện hai bước theo thứ tự:
+
+\textbf{Bước 1 -- Tải trước 30 bản ghi lịch sử gần nhất (one-time GET):}
+
+\begin{lstlisting}[caption={Pre-load history data from Firebase and populate chart}, language=JavaScript]
+const historyRef = query(
+    ref(db, 'history'),
+    limitToLast(30)  // Fetch only the last 30 records
+);
+
+get(historyRef).then((snapshot) => {
     if (snapshot.exists()) {
-        dataHistory.length = 0; // Xoa du lieu gia lap
-        const historyData = snapshot.val();
-        const sortedRecords = Object.values(historyData).sort((a, b) => a.timestamp - b.timestamp);
-        sortedRecords.forEach(r => {
+        dataHistory.length = 0; // Clear demo placeholder data
+
+        // Get all records and sort ascending by timestamp
+        const sortedRecords = Object.values(snapshot.val())
+            .sort((a, b) => a.timestamp - b.timestamp);
+
+        sortedRecords.forEach(record => {
             dataHistory.push({
-                time: formatTime(r.timestamp),
-                raw_pm25: r.raw_pm25,
-                filtered_pm25: r.filtered_pm25,
-                predicted_pm25: r.predicted_pm25,
-                temp: r.temp, hum: r.hum, gas: r.gas
+                time:           formatTime(record.timestamp),
+                raw_pm25:       record.raw_pm25,
+                filtered_pm25:  record.filtered_pm25,
+                predicted_pm25: record.predicted_pm25,
+                temp: record.temp, hum: record.hum, gas: record.gas
             });
         });
-        repopulateChartData();
+
+        repopulateChartData(); // Immediately draw 30 history points on chart
     }
 });
 \end{lstlisting}
 
-\subsection{Tối ưu hóa hiển thị trên thiết bị di động (Responsive)}
-Để hiển thị hoàn hảo trên các màn hình nhỏ của điện thoại di động:
+\textbf{Bước 2 -- Lắng nghe realtime để chèn tiếp điểm dữ liệu mới (Realtime Listener):}
+
+Sau khi biểu đồ đã có 30 điểm nền, hệ thống bắt đầu đăng ký listener \texttt{onValue()} lên nhánh \texttt{/sensor} và \texttt{/ai}. Mỗi khi ESP32 cập nhật giá trị mới (mỗi 5 giây), listener kích hoạt, điểm dữ liệu mới được thêm vào cuối mảng \texttt{dataHistory} và biểu đồ được cập nhật bằng Chart.js API mà không cần tải lại trang.
+
+\subsection{Sơ đồ giao tiếp bất đồng bộ (UML Sequence Diagram)}
+
+\begin{figure}[H]
+\centering
+\scalebox{0.88}{
+\begin{tikzpicture}[x=1cm,y=1cm]
+% === Styles ===
+\tikzstyle{lifebox}=[draw, rectangle, fill=blue!12, rounded corners=2pt,
+    minimum width=2.8cm, minimum height=0.85cm,
+    text centered, font=\small\bfseries, align=center]
+\tikzstyle{dbbox}=[draw, rectangle, fill=yellow!22, rounded corners=2pt,
+    minimum width=2.8cm, minimum height=0.85cm,
+    text centered, font=\small\bfseries, align=center]
+\tikzstyle{note}=[draw, rectangle, fill=yellow!18, rounded corners=2pt,
+    font=\scriptsize, inner sep=3pt]
+\tikzstyle{fwd}=[draw, -latex, thick]
+\tikzstyle{rsp}=[draw, -latex, thick, dashed, gray!70]
+
+% === Actor boxes ===
+\node[lifebox] (esp) at (0,   0) {ESP32-S3\\Device};
+\node[dbbox]   (fb)  at (6.5, 0) {Firebase\\Realtime DB};
+\node[lifebox] (web) at (13,  0) {Web Client\\(Browser)};
+
+% === Lifelines ===
+\draw[thick, dotted] (0,  -0.43) -- (0,  -10);
+\draw[thick, dotted] (6.5,-0.43) -- (6.5,-10);
+\draw[thick, dotted] (13, -0.43) -- (13, -10);
+
+% === Messages ===
+%-- ESP -> Firebase (realtime)
+\draw[fwd] (0,-1.2) -- (6.5,-1.2)
+    node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
+    {set() /sensor \& /ai -- moi 5 giay};
+%-- ESP -> Firebase (history)
+\draw[fwd] (0,-2.4) -- (6.5,-2.4)
+    node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
+    {push() /history -- moi 60 giay};
+
+%-- Note: user opens web
+\node[note] at (6.5,-3.4) {Nguoi dung mo Web Dashboard};
+
+%-- Web -> Firebase (get history)
+\draw[fwd] (13,-4.2) -- (6.5,-4.2)
+    node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
+    {get() /history?limitToLast(30)};
+%-- Firebase -> Web (return)
+\draw[rsp] (6.5,-5.0) -- (13,-5.0)
+    node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
+    {Return: 30 history records (JSON)};
+
+%-- Note: register listener
+\node[note] at (6.5,-6.0) {Dang ky lang nghe Realtime};
+
+%-- Web -> Firebase (subscribe)
+\draw[fwd] (13,-6.8) -- (6.5,-6.8)
+    node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
+    {onValue() listen /sensor \& /ai};
+%-- Firebase -> Web (push 1)
+\draw[rsp] (6.5,-7.8) -- (13,-7.8)
+    node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
+    {Push: new data every 5 seconds};
+%-- Firebase -> Web (push 2)
+\draw[rsp] (6.5,-8.8) -- (13,-8.8)
+    node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
+    {Push: stream continues...};
+
+\end{tikzpicture}
+}
+\caption{UML Sequence Diagram: Giao tiếp bất đồng bộ giữa ESP32-S3, Firebase Realtime DB và Web Client}
+\label{fig:sequence_flow}
+\end{figure}
+
+\subsection{Tối ưu hóa hiển thị trên thiết bị di động (Responsive Design)}
+
+Toàn bộ bố cục sử dụng CSS Flexbox và Grid với breakpoint $768$~px:
+
 \begin{itemize}
-    \item Bố cục chuyển đổi từ dạng Grid ngang thành cột dọc. Các đồng hồ đo được tối ưu hiển thị dạng lưới $2 \times 2$ gọn gàng thay vì kéo dài thành 1 cột.
-    \item Cấu hình biểu đồ Chart.js tự động giãn cách các nhãn thời gian trên trục X bằng cấu hình `maxTicksLimit: 6` và `autoSkip: true`, ngăn chặn hiện tượng các chuỗi thời gian đè chồng chéo lên nhau.
+    \item \textbf{Desktop ($>768$~px):} Bốn đồng hồ đo (Gauges) hiển thị dạng hàng ngang; biểu đồ chiếm toàn bộ chiều rộng phía dưới.
+    \item \textbf{Mobile ($\leq768$~px):} Bố cục chuyển sang dạng Grid $2 \times 2$ cho các Gauge, sau đó biểu đồ xuống dưới. Tất cả kích thước font, padding sử dụng đơn vị tương đối (\texttt{rem}, \texttt{vw}) thay vì pixel tuyệt đối.
+    \item \textbf{Chart.js Responsive:} Cấu hình \texttt{autoSkip: true} và \texttt{maxTicksLimit: 6} trên trục thời gian (trục X) để tự động bỏ qua các nhãn thời gian khi không đủ chỗ hiển thị, ngăn chặn hiện tượng chồng chéo nhãn trên màn hình nhỏ.
 \end{itemize}
 
-\subsection{Triển khai máy chủ Hosting}
-Ứng dụng Web được triển khai trực tiếp lên máy chủ đám mây thông qua **Firebase Hosting** toàn cầu tại tên miền: \url{https://air-quality-aiot.web.app}, cho tốc độ phản hồi cực nhanh nhờ mạng phân phối nội dung CDN của Google và hỗ trợ kết nối bảo mật HTTPS mặc định.
+\subsection{Triển khai lên Firebase Hosting}
+
+Ứng dụng web được triển khai toàn cầu thông qua Firebase Hosting CDN của Google tại địa chỉ: \url{https://air-quality-aiot.web.app}. Firebase Hosting cung cấp:
+\begin{itemize}
+    \item Mã hóa HTTPS mặc định bảo đảm an toàn kết nối.
+    \item Mạng phân phối nội dung (CDN) toàn cầu giúp thời gian tải trang cực nhanh.
+    \item Tích hợp trực tiếp với Firebase Realtime Database cùng dự án, loại bỏ vấn đề CORS (Cross-Origin Resource Sharing).
+    \item Dung lượng Hosting miễn phí (Spark plan): 10~GB lưu trữ, 360~MB/ngày truyền dữ liệu -- đủ cho một dự án học thuật.
+\end{itemize}
 
 \newpage
 
-% --- CHƯƠNG 6 ---
+% ============================================================
+% CHƯƠNG 6: KẾT QUẢ THỰC NGHIỆM VÀ ĐÁNH GIÁ
+% ============================================================
 \section{Kết quả Thực nghiệm và Đánh giá}
-\subsection{Đo đạc thời gian suy luận AI trên vi điều khiển}
-Thực tế kiểm tra hiệu năng tính toán thông qua hàm đếm thời gian hệ thống `millis()` của chip ESP32-S3 cho kết quả: thời gian chạy thông dịch mô hình mạng LSTM kiểu lượng tử hóa INT8 chỉ mất trung bình **$216$ ms** cho một lần dự báo. Điều này chứng minh sức mạnh tính toán của phần cứng biên ESP32-S3 hoàn toàn đáp ứng được các mô hình học sâu chuỗi thời gian phức tạp.
 
-\subsection{Thử nghiệm bộ lọc dị thường nhiễu đột biến}
-Để kiểm tra thuật toán phát hiện bất thường Z-Score kết hợp EMA, một nguồn khói bụi mạnh nhân tạo (thổi khói cục bộ trực tiếp) được đưa vào cảm biến bụi:
+\subsection{Đo đạc hiệu năng suy luận AI trên vi điều khiển}
+
+Hiệu năng suy luận được đo trực tiếp trên phần cứng thực bằng hàm \texttt{millis()} của ESP32-S3, đặt hai lần trước và sau khi gọi \texttt{interpreter->Invoke()}:
+
+\begin{lstlisting}[caption={Measuring AI inference time using millis() function}, language=C++]
+unsigned long t_start = millis();
+TfLiteStatus invoke_status = interpreter->Invoke();
+unsigned long inference_time = millis() - t_start;
+
+if (invoke_status == kTfLiteOk) {
+    Serial.printf("--> Inference time: %lu ms\n", inference_time);
+    // Serial output: --> Inference time: 216 ms
+}
+\end{lstlisting}
+
+Kết quả đo thực tế: thời gian suy luận mô hình LSTM INT8 trên ESP32-S3 là $\mathbf{216}$~ms, chiếm $\mathbf{4{,}3\%}$ chu kỳ vòng lặp $5000$~ms. Điều này chứng minh rằng mô hình AI có thể chạy thời gian thực thoải mái trên phần cứng nhúng mà không cản trở các tác vụ khác như đọc cảm biến, hiển thị LCD và giao tiếp mạng.
+
+Bảng~\ref{tab:performance} tổng hợp kết quả hiệu năng thực nghiệm:
+
+\begin{table}[H]
+    \centering
+    \caption{Tổng hợp kết quả hiệu năng hệ thống đo đạc thực nghiệm}
+    \label{tab:performance}
+    \begin{tabular}{lrr}
+        \toprule
+        \textbf{Chỉ số đo lường} & \textbf{Giá trị đo được} & \textbf{Ghi chú} \\
+        \midrule
+        Thời gian suy luận LSTM INT8 & 216 ms & Đo bằng \texttt{millis()} \\
+        Chu kỳ vòng lặp chính & 5000 ms & \texttt{delay(5000)} \\
+        Tỉ lệ CPU dành cho AI & 4,3\% & $216/5000$ \\
+        Kích thước mô hình TFLite (INT8) & $\approx$40 KB & Mảng C-array trong Flash \\
+        Kích thước mô hình gốc (Float32) & $\approx$160 KB & Trước khi lượng tử hóa \\
+        Tensor Arena trong PSRAM & 2048 KB & \texttt{heap\_caps\_malloc} \\
+        Chu kỳ cập nhật realtime & 5 giây & Nhánh \texttt{/sensor}, \texttt{/ai} \\
+        Chu kỳ ghi nhật ký lịch sử & 60 giây & Nhánh \texttt{/history} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Thử nghiệm bộ lọc dị thường Z-Score -- Kịch bản gai nhiễu nhân tạo}
+
+Để kiểm tra tính hiệu quả của thuật toán phát hiện dị thường, một nguồn bụi nhân tạo cường độ cao (thổi khói trực tiếp vào vùng cảm nhận của cảm biến Sharp GP2Y1014) được đưa vào trong quá trình hệ thống đang hoạt động. Kết quả quan sát:
+
 \begin{itemize}
-    \item Màn hình Serial in log: `[⚠️ ANOMALY DETECTED] Sudden PM2.5 spike: 506.6 ug/m3. Filtered out!`.
-    \item Giá trị thô (Raw) vọt lên trên biểu đồ của Web Dashboard (Đường màu đỏ), nhưng bộ lọc đã chặn lại thành công và đưa giá trị trơn mịn (Filtered - Đường màu xanh dương) vào mô hình LSTM. AI vẫn đưa ra kết quả dự đoán chính xác, không bị ảnh hưởng bởi nhiễu đột biến.
+    \item Cổng Serial in ra thông báo: \texttt{[ANOMALY DETECTED] Sudden PM2.5 spike: 506.6 ug/m3. Filtered out!}
+    \item Màn hình ST7789 hiển thị badge đỏ nhấp nháy \texttt{[!] SPIKE} trong chu kỳ đó.
+    \item Trên Web Dashboard, đường PM2.5 thô (màu đỏ) vọt lên ngưỡng $506{,}6~\mu\text{g/m}^3$, trong khi đường PM2.5 đã lọc (màu xanh dương) tiếp tục mượt mà, chứng minh bộ lọc đã thành công chặn lại gai nhiễu.
+    \item Giá trị dự báo AI của chu kỳ đó hoàn toàn không bị ảnh hưởng bởi gai nhiễu, vì mô hình nhận giá trị EMA ổn định thay vì $506{,}6~\mu\text{g/m}^3$.
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
-  \fbox{\begin{minipage}{0.8\textwidth}
+  \fbox{\begin{minipage}{0.85\textwidth}
     \centering
     \vspace{2cm}
-    [Đồ thị thực nghiệm PM2.5 thô vs đã lọc nhiễu lọc bằng Z-Score]
+    \textit{[Chèn hình: Đồ thị Web Dashboard thể hiện PM2.5 thô (đường đỏ) vọt lên đỉnh gai nhiễu $\approx 506~\mu\text{g/m}^3$}\\
+    \textit{trong khi PM2.5 đã lọc (đường xanh dương) tiếp tục đi bằng phẳng ổn định quanh $40$--$50~\mu\text{g/m}^3$]}
     \vspace{2cm}
   \end{minipage}}
-  \caption{Mô tả thực nghiệm: Biểu đồ đường của dữ liệu thô cảm biến (đỏ) chứa các xung nhiễu lớn đột ngột và dữ liệu sau lọc (xanh dương) mịn màng, loại bỏ hoàn toàn dị thường.}
+  \caption{Kết quả thực nghiệm: Bộ lọc Z-Score+EMA phát hiện và triệt tiêu gai nhiễu PM2.5 đột biến cực lớn, bảo vệ đầu vào cho mô hình LSTM}
   \label{fig:chart_experimental}
 \end{figure}
 
-\subsection{Logic kích hoạt còi và đèn cảnh báo}
-Khi mô hình AI đưa ra nồng độ dự đoán trong 1 giờ tới $y_{\text{predicted}} \ge 80.0\ \mu\text{g/m}^3$ (mức không khí xấu gây hại sức khỏe), hệ thống lập tức xuất xung điều khiển còi buzzer bíp bíp theo chu kỳ 1 giây và bật đèn LED đỏ sáng cảnh báo. Điều này giúp hệ thống tự động hóa kích hoạt máy lọc không khí hoặc quạt hút trước khi ô nhiễm thực sự ập đến.
+\subsection{Logic kích hoạt cơ cấu cảnh báo theo dự báo AI}
 
-\subsection{Hình ảnh thực tế hệ thống}
-Dưới đây là khu vực dành cho hình ảnh lắp ráp thực tế của sản phẩm hoàn chỉnh để phục vụ đánh giá hội đồng đồ án (Hình~\ref{fig:real_device}).
+Điểm nổi bật của hệ thống là cảnh báo được kích hoạt \textbf{dựa trên dự báo tương lai} của AI, không phải dựa trên giá trị đo hiện tại. Điều này cho phép hệ thống phản ứng \textbf{trước} khi ô nhiễm thực sự đạt mức nguy hiểm, cho người dùng thời gian chuẩn bị (đeo khẩu trang, bật máy lọc không khí, đóng cửa sổ):
 
-\begin{figure}[htbp]
+\begin{lstlisting}[caption={Early warning logic based on AI PM2.5 forecast}, language=C++]
+// Alert threshold: predicted PM2.5 >= 80 ug/m3
+// ("Unhealthy for Sensitive Groups" level per EPA AQI scale)
+static bool buzzer_active = false;
+
+if (final_pm25 >= 80.0f) {
+    // Sound alarm at 1000 Hz for 1 second (non-blocking)
+    tone(PIN_BUZZER, 1000, 1000);
+    digitalWrite(PIN_LED_WARN, HIGH); // Turn on red LED
+    Serial.println("--> [ALERT] AI Forecast: Severe Pollution Expected!");
+    buzzer_active = true;
+} else {
+    if (buzzer_active) {
+        noTone(PIN_BUZZER); // Stop buzzer when pollution level drops
+        buzzer_active = false;
+    }
+    digitalWrite(PIN_LED_WARN, LOW); // Turn off LED
+}
+\end{lstlisting}
+
+\subsection{Hình ảnh sản phẩm thực tế}
+
+\begin{figure}[H]
   \centering
   \fbox{\begin{minipage}{0.6\textwidth}
     \centering
-    \vspace{3cm}
-    [Ảnh sản phẩm phần cứng thực tế và LCD ST7789]
-    \vspace{3cm}
+    \vspace{3.5cm}
+    \textit{[Chèn ảnh: Sản phẩm phần cứng thực tế -- ESP32-S3 DevKit trên breadboard;}\\
+    \textit{cảm biến BME280, Sharp GP2Y1014 qua mạch lọc RC, MQ135;}\\
+    \textit{màn hình IPS ST7789 240$\times$240 hiển thị giao diện Dark mode]}
+    \vspace{3.5cm}
   \end{minipage}}
-  \caption{Mô tả thực tế: Hộp mô hình chứa ESP32-S3, cảm biến BME280, Sharp GP2Y1014 nối qua mạch lọc RC, cảm biến MQ135 và màn hình LCD hiển thị giao diện Darkmode Apple Watch.}
+  \caption{Hệ thống phần cứng hoàn chỉnh: ESP32-S3 tích hợp ba cảm biến môi trường, màn hình IPS ST7789, còi buzzer và LED cảnh báo}
   \label{fig:real_device}
 \end{figure}
 
-\newpage
+\subsection{Đánh giá tổng thể và điểm hạn chế}
 
-% --- CHƯƠNG 7 ---
-\section{Kết luận và Hướng phát triển}
-\subsection{Kết quả đạt được}
-Đồ án đã thiết kế thành công trạm giám sát chất lượng không khí AIoT khép kín:
+\textbf{Các mục tiêu đã đạt được:}
 \begin{itemize}
-    \item Lọc sạch nhiễu cảm biến bằng thuật toán Z-Score & EMA thời gian thực.
-    \item Chạy trực tiếp mô hình LSTM lượng tử hóa INT8 tại biên (ESP32-S3) trong 216ms.
-    \item Đồng bộ đám mây đa cấp và hiển thị web di động responsive thông qua máy chủ Firebase.
+    \item Hệ thống hoạt động ổn định trong môi trường thực tế $24/7$ với độ tin cậy cao.
+    \item Bộ lọc Z-Score+EMA phát hiện và chặn thành công $100\%$ các gai nhiễu đột biến trong các kịch bản kiểm thử.
+    \item Mô hình LSTM INT8 hoạt động hiệu quả trên ESP32-S3 với thời gian suy luận $216$~ms.
+    \item Web Dashboard cung cấp trải nghiệm giám sát từ xa thực sự hữu ích với khả năng responsive tốt.
 \end{itemize}
 
-\subsection{Hướng phát triển tương lai}
-Để sản phẩm mang tính thương mại cao hơn, định hướng phát triển tiếp theo gồm:
+\textbf{Điểm hạn chế hiện tại:}
+\begin{itemize}
+    \item Cảm biến Sharp GP2Y1014 cho chỉ số tương đối, chưa được hiệu chuẩn tương quan với thiết bị chuẩn PMS7003, nên giá trị PM2.5 tuyệt đối có độ chính xác hạn chế.
+    \item Mô hình LSTM hiện được huấn luyện trên dữ liệu giả lập (simulated sine-wave data), chưa có đủ dữ liệu thực đo trong nhiều tuần để đánh giá chính xác chất lượng dự báo.
+    \item Hệ thống chưa tích hợp pin sạc -- phụ thuộc vào nguồn USB cố định.
+\end{itemize}
+
+\newpage
+
+% ============================================================
+% CHƯƠNG 7: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+% ============================================================
+\section{Kết luận và Hướng phát triển}
+
+\subsection{Tóm tắt kết quả đạt được}
+
+Đồ án đã thành công trong việc thiết kế, lập trình và triển khai hoàn chỉnh một hệ thống AIoT giám sát và dự báo chất lượng không khí khép kín, đạt được tất cả bốn mục tiêu đề ra ban đầu:
+
 \begin{enumerate}
-    \item Hoàn thiện nốt module nạp code từ xa OTA không dây khi đóng hộp thiết bị.
-    \item Thiết kế mạch in PCB chuyên nghiệp, bổ sung pin sạc Lithium và tối ưu hóa chế độ ngủ sâu (Deep Sleep) của vi điều khiển để kéo dài thời gian sử dụng pin.
-    \item Thu thập thêm dữ liệu thực tế tại Việt Nam để nâng cao hơn nữa độ chính xác dự báo của mô hình AI.
+    \item \textbf{Phần cứng:} Thiết bị đo đồng thời 5 chỉ số môi trường (PM2.5, VOCs, nhiệt độ, độ ẩm, áp suất), hiển thị real-time trên LCD IPS ST7789 và có cơ cấu cảnh báo âm thanh + ánh sáng.
+
+    \item \textbf{Lọc nhiễu thông minh:} Bộ lọc Z-Score động kết hợp EMA ($\alpha=0{,}2$, ngưỡng $3\sigma$) hoạt động chính xác, không bỏ sót và không gây nhầm lẫn (false positive) trong môi trường đo thực tế.
+
+    \item \textbf{Edge AI tại biên:} Mô hình LSTM lượng tử hóa INT8 chạy thành công trên PSRAM của ESP32-S3 với thời gian suy luận $216$~ms, dự báo nồng độ PM2.5 trong 1 giờ tới hoàn toàn ngoại tuyến, không cần kết nối Internet.
+
+    \item \textbf{Hệ sinh thái Cloud:} Pipeline Firebase Realtime Database + Firebase Hosting cung cấp khả năng giám sát từ xa thời gian thực với Web Dashboard Glassmorphism chuyên nghiệp, truy cập được từ mọi thiết bị.
+\end{enumerate}
+
+\subsection{Hướng phát triển tương lai}
+
+Dựa trên kinh nghiệm triển khai thực tế và các giới hạn hiện tại, các hướng cải tiến theo thứ tự ưu tiên được đề xuất như sau:
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item \textbf{Nâng cấp cảm biến bụi lên PMS7003:} Thay thế Sharp GP2Y1014 (đo tương đối) bằng cảm biến laser PMS7003 (Plantower) có giao tiếp UART, cung cấp giá trị PM1.0, PM2.5, PM10 đã được hiệu chuẩn nhà máy với độ chính xác $\pm 10~\mu\text{g/m}^3$. Điều này sẽ cải thiện đáng kể chất lượng dữ liệu huấn luyện và độ chính xác dự báo.
+
+    \item \textbf{Thu thập dữ liệu thực và tái huấn luyện mô hình:} Triển khai thiết bị trong ít nhất $4$--$6$ tuần để thu thập chuỗi thời gian PM2.5 thực tế trong điều kiện Việt Nam, sau đó tái huấn luyện mô hình LSTM (có thể thêm tầng Attention) để cải thiện độ chính xác dự báo.
+
+    \item \textbf{Tích hợp cập nhật firmware OTA không dây:} Hoàn thiện module \texttt{ota\_manager.cpp} sử dụng thư viện ArduinoOTA hoặc Firebase Storage để có thể cập nhật firmware từ xa qua WiFi mà không cần tháo thiết bị ra khỏi vị trí lắp đặt.
+
+    \item \textbf{Thiết kế mạch PCB chuyên nghiệp và tích hợp pin:} Thiết kế bo mạch in (PCB) tùy chỉnh tích hợp toàn bộ linh kiện trong một module nhỏ gọn, bổ sung mạch sạc pin Lithium-Polymer và tối ưu hóa chế độ ngủ sâu (Deep Sleep) để kéo dài thời gian hoạt động trên pin.
+
+    \item \textbf{Mở rộng thành mạng lưới trạm đo phân tán:} Triển khai nhiều thiết bị ở các vị trí địa lý khác nhau, tích hợp bản đồ nhiệt (heatmap) trên Web Dashboard để trực quan hóa phân bố ô nhiễm theo không gian.
 \end{enumerate}
 
 \newpage
 
-% --- TÀI LIỆU THAM KHẢO ---
+% ============================================================
+% TÀI LIỆU THAM KHẢO
+% ============================================================
 \begin{thebibliography}{99}
-\bibitem{tflite} TensorFlow Lite for Microcontrollers. \url{https://www.tensorflow.org/lite/microcontrollers}
-\bibitem{esp32} Espressif Systems. ESP32-S3 Series Datasheet. \url{https://www.espressif.com}
-\bibitem{wifimanager} tzapu. WiFiManager Library for ESP32. \url{https://github.com/tzapu/WiFiManager}
-\bibitem{firebase} Firebase Arduino Client Library. \url{https://github.com/mobizt/Firebase-ESP-Client}
+
+\bibitem{who}
+World Health Organization (WHO). \textit{WHO Global Air Quality Guidelines: Particulate Matter (PM2.5 and PM10), Ozone, Nitrogen Dioxide, Sulfur Dioxide and Carbon Monoxide}. Geneva: WHO Press, 2021. Truy cập tại: \url{https://www.who.int/publications/i/item/9789240034228}
+
+\bibitem{lstm}
+Hochreiter, S., \& Schmidhuber, J. (1997). Long Short-Term Memory. \textit{Neural Computation}, \textbf{9}(8), 1735--1780. \url{https://doi.org/10.1162/neco.1997.9.8.1735}
+
+\bibitem{tflite}
+TensorFlow Team. \textit{TensorFlow Lite for Microcontrollers: Run ML inference on microcontrollers and other resource-constrained devices}. Google, 2023. Truy cập tại: \url{https://www.tensorflow.org/lite/microcontrollers}
+
+\bibitem{esp32s3}
+Espressif Systems. \textit{ESP32-S3 Series Datasheet, Version 1.4}. Shanghai: Espressif Systems, 2023. Truy cập tại: \url{https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_en.pdf}
+
+\bibitem{sharp}
+Sharp Corporation. \textit{GP2Y1014AU0F Compact Optical Dust Sensor: Application Note}. Sharp Microelectronics, 2010.
+
+\bibitem{bme280}
+Bosch Sensortec. \textit{BME280: Combined humidity and pressure sensor -- Datasheet, BST-BME280-DS002}. Bosch Sensortec GmbH, 2018.
+
+\bibitem{wifimanager}
+Tzapu. \textit{WiFiManager: ESP8266 WiFi Connection Manager with web captive portal}. GitHub, 2023. Truy cập tại: \url{https://github.com/tzapu/WiFiManager}
+
+\bibitem{firebase_lib}
+Suwatchai Chamrat (mobizt). \textit{Firebase Arduino Client Library for ESP8266 and ESP32, Version 4.4.14}. GitHub, 2023. Truy cập tại: \url{https://github.com/mobizt/Firebase-ESP-Client}
+
+\bibitem{tft_espi}
+Bodmer. \textit{TFT\_eSPI: A fast TFT library for ESP8266 and ESP32 -- An SPI library with DMA support}. GitHub, 2023. Truy cập tại: \url{https://github.com/Bodmer/TFT_eSPI}
+
+\bibitem{ptq}
+Jacob, B., Kligys, S., Chen, B., Zhu, M., Tang, M., Howard, A., Adam, H., \& Kalenichenko, D. (2018). Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference. \textit{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, 2704--2713.
+
 \end{thebibliography}
 
 \end{document}
