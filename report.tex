@@ -75,10 +75,11 @@
 }
 
 % ========== HEADER / FOOTER ==========
+\setlength{\headheight}{14pt}
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\small Hệ thống Giám sát Chất lượng Không khí AIoT}
-\fancyhead[R]{\small Nhóm thực hiện}
+\fancyhead[R]{\small Nhóm: KANT}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 
@@ -87,50 +88,46 @@
 
 % ========== TRANG BÌA ==========
 \thispagestyle{empty}
-\begin{center}
-    \large BỘ GIÁO DỤC VÀ ĐÀO TẠO \\[0.2cm]
-    \large TRƯỜNG ĐẠI HỌC ABCCCCD \\[0.1cm]
-    \textbf{\large KHOA CÔNG NGHỆ THÔNG TIN}
-\end{center}
 
-\vspace{1cm}
+% Khung bìa (background image)
+\begin{tikzpicture}[remember picture,overlay]
+    \node[inner sep=0pt] at (current page.center) {\includegraphics[width=0.95\paperwidth,height=0.95\paperheight]{Bia_mau_media/media/image1.jpg}};
+\end{tikzpicture}
+
+\vspace*{1cm}
+\begin{center}
+    \textbf{\large TRƯỜNG ĐẠI HỌC LẠC HỒNG} \\[0.1cm]
+    \textbf{\large KHOA CÔNG NGHỆ THÔNG TIN} \\[0.5cm]
+    \includegraphics[width=5.5cm]{Bia_mau_media/media/image2.jpg}
+\end{center}
 
 \vspace{1.5cm}
 
 \begin{center}
-    \textbf{\Large BÁO CÁO ĐỒ ÁN MÔN HỌC}\\[0.5cm]
-    \rule{14cm}{1.5pt}\\[0.4cm]
+    \textbf{\Large BÁO CÁO ĐỒ ÁN MÔN HỌC}\\[1cm]
+    \textbf{\large \underline{ĐỀ TÀI:}}\\[0.5cm]
     \textbf{\LARGE HỆ THỐNG GIÁM SÁT VÀ DỰ ĐOÁN}\\[0.3cm]
     \textbf{\LARGE CHẤT LƯỢNG KHÔNG KHÍ SỬ DỤNG EDGE AI}\\[0.3cm]
-    \textbf{\Large (AIR QUALITY AIoT)}\\[0.4cm]
-    \rule{14cm}{1.5pt}
+    \textbf{\Large (AIR QUALITY AIoT)}
 \end{center}
 
-\vspace{1.5cm}
+\vspace{2cm}
 
-\begin{flushright}
-    \begin{tabular}{ll}
-        \textbf{Giảng viên hướng dẫn:} & \makebox[5.5cm]{\dotfill} \\[0.3cm]
-    \end{tabular}
-\end{flushright}
-
-\vspace{0.2cm}
 \begin{center}
-    \textbf{DANH SÁCH THÀNH VIÊN THỰC HIỆN} \\[0.2cm]
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{|c|p{6cm}|c|c|}
-        \hline
-        \textbf{STT} & \hfil \textbf{Họ và tên} \hfil & \textbf{MSSV} & \textbf{Lớp} \\ \hline
-        1 & & & \\ \hline
-        2 & & & \\ \hline
-        3 & & & \\ \hline
-        4 & & & \\ \hline
+    \begin{tabular}{l l}
+        \textbf{\large GVHD:} & \textbf{\large Hồ Ngọc Hoàng Long} \\[0.3cm]
+        \textbf{\large Lớp:} & \textbf{\large 23CT111} \\[0.3cm]
+        \textbf{\large SVTH:} & \textbf{\large Tống Anh Kha - 123000367} \\
+                              & \textbf{\large Nguyễn Thanh Nam - 123000156} \\
+                              & \textbf{\large Đinh Thị Quỳnh Anh - 123000379} \\
+                              & \textbf{\large Nguyễn Ngô Tôn Thái - 123000558} \\
     \end{tabular}
 \end{center}
 
-\vspace{1.2cm}
+\vfill
+
 \begin{center}
-    \large \textbf{TP.\ HỒ CHÍ MINH, NĂM 2026}
+    \textbf{\large \textit{Đồng Nai - 2026}}
 \end{center}
 
 \newpage
@@ -1103,7 +1100,7 @@ Sau khi biểu đồ đã có 30 điểm nền, hệ thống bắt đầu đăng
 %-- Web -> Firebase (get history)
 \draw[fwd] (13,-4.2) -- (6.5,-4.2)
     node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
-    {get() /history?limitToLast(30)};
+    {get() /history, limitToLast(30)};
 %-- Firebase -> Web (return)
 \draw[rsp] (6.5,-5.0) -- (13,-5.0)
     node[midway, above, font=\scriptsize, fill=white, inner sep=1pt]
