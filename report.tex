@@ -1,5 +1,6 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage[utf8]{vietnam}
+\usepackage{mathptmx} % Times New Roman font
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -150,7 +151,7 @@
 
 \vspace{0.3cm}
 \noindent
-\textbf{Giao diện Web Dashboard} được triển khai tại \url{https://air-quality-aiot.web.app} theo phong cách Glassmorphism tối giản, hiển thị đồng thời ba luồng dữ liệu (PM2.5 thô, PM2.5 đã lọc nhiễu và PM2.5 dự báo AI), hỗ trợ tải trước 30 bản ghi lịch sử nhằm đảm bảo biểu đồ liên tục ngay từ thời điểm truy cập. Kết quả thực nghiệm xác nhận hệ thống phát hiện và chặn thành công xung nhiễu PM2.5 lên đến $506{,}6~\mu\text{g/m}^3$ và tự động kích hoạt cảnh báo âm thanh khi mô hình AI dự báo ô nhiễm vượt ngưỡng $80~\mu\text{g/m}^3$.
+\textbf{Giao diện Web Dashboard} được triển khai tại \url{https://aiot-air-quality.web.app} theo phong cách Glassmorphism tối giản, hiển thị đồng thời ba luồng dữ liệu (PM2.5 thô, PM2.5 đã lọc nhiễu và PM2.5 dự báo AI), hỗ trợ tải trước 30 bản ghi lịch sử nhằm đảm bảo biểu đồ liên tục ngay từ thời điểm truy cập. Kết quả thực nghiệm xác nhận hệ thống phát hiện và chặn thành công xung nhiễu PM2.5 lên đến $506{,}6~\mu\text{g/m}^3$ và tự động kích hoạt cảnh báo âm thanh khi mô hình AI dự báo ô nhiễm vượt ngưỡng $80~\mu\text{g/m}^3$.
 
 \vspace{0.3cm}
 \noindent
@@ -1072,7 +1073,7 @@ Sau khi biểu đồ đã có 30 điểm nền, hệ thống bắt đầu đăng
 \tikzstyle{note}=[draw, rectangle, fill=yellow!18, rounded corners=2pt,
     font=\scriptsize, inner sep=3pt]
 \tikzstyle{fwd}=[draw, -latex, thick]
-\tikzstyle{rsp}=[draw, -latex, thick, dashed, gray!70]
+\tikzstyle{rsp}=[draw, -latex, thick, dashed]
 
 % === Actor boxes ===
 \node[lifebox] (esp) at (0,   0) {ESP32-S3\\Device};
@@ -1140,7 +1141,7 @@ Toàn bộ bố cục sử dụng CSS Flexbox và Grid với breakpoint $768$~px
 
 \subsection{Triển khai lên Firebase Hosting}
 
-Ứng dụng web được triển khai toàn cầu thông qua Firebase Hosting CDN của Google tại địa chỉ: \url{https://air-quality-aiot.web.app}. Firebase Hosting cung cấp:
+Ứng dụng web được triển khai toàn cầu thông qua Firebase Hosting CDN của Google tại địa chỉ: \url{https://aiot-air-quality.web.app}. Firebase Hosting cung cấp:
 \begin{itemize}
     \item Mã hóa HTTPS mặc định bảo đảm an toàn kết nối.
     \item Mạng phân phối nội dung (CDN) toàn cầu giúp thời gian tải trang cực nhanh.
