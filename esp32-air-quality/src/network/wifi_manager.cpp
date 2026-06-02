@@ -54,6 +54,7 @@ void AppWiFiManager::init() {
     }
 
     Serial.println("\n[WiFi] Đang tìm kiếm và kết nối mạng đã lưu...");
+    displayManager.showConnectingScreen(); // Hiển thị màn hình chờ kết nối
     
     // Tự động kết nối tới WiFi cũ. Nếu không thấy hoặc thất bại, phát AP cấu hình:
     // Tên mạng AP: "AirQuality_AIoT_Setup", Mật khẩu: "12345678"

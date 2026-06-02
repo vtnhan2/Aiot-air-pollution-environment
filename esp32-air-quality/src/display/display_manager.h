@@ -33,6 +33,7 @@ public:
     void updateData(float temp, float hum, float raw_pm25, float filtered_pm25, float predicted_pm25, float gas_volts, bool wifi_connected, bool anomaly);
     void showWiFiSetup(String ssid, String pass);
     void showBootScreen();
+    void showConnectingScreen();
 
 private:
     void drawGrid();

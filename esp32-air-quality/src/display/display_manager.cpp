@@ -268,3 +268,24 @@ void DisplayManager::showBootScreen() {
     tft->setCursor(10, 200);
     tft->print("Dang bat dau thu thap...");
 }
+
+void DisplayManager::showConnectingScreen() {
+    if (!tft) return;
+    tft->fillScreen(BLACK);
+    
+    tft->fillRoundRect(10, 10, 220, 40, 5, 0xFD20); // Orange
+    tft->setTextColor(WHITE);
+    tft->setFont();
+    tft->setTextSize(2);
+    tft->setCursor(50, 20);
+    tft->print("STARTING");
+    
+    tft->setTextSize(1);
+    tft->setTextColor(YELLOW);
+    tft->setCursor(10, 100);
+    tft->print("Dang kiem tra mang WiFi...");
+    
+    tft->setTextColor(CYAN);
+    tft->setCursor(10, 130);
+    tft->print("Vui long doi giay lat.");
+}

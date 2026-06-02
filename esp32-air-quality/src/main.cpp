@@ -120,6 +120,11 @@ void setup() {
   digitalWrite(PIN_BUZZER, LOW);
   digitalWrite(PIN_LED_WARN, LOW);
 
+  // Khởi tạo màn hình (Phải khởi tạo TRƯỚC WiFi để có thể vẽ màn hình chờ/setup)
+  Serial.println("[DEBUG] Calling displayManager.begin()...");
+  displayManager.begin();
+  Serial.println("[DEBUG] displayManager.begin() finished.");
+
 #if USE_FIREBASE
   // Khởi tạo WiFi (Sử dụng cổng cấu hình tự động khi mất kết nối)
   wifiManager.init();
@@ -132,11 +137,6 @@ void setup() {
   Serial.println(
       "[INFO] Firebase is disabled in code. Running in offline mode.");
 #endif
-
-  // Khởi tạo màn hình
-  Serial.println("[DEBUG] Calling displayManager.begin()...");
-  displayManager.begin();
-  Serial.println("[DEBUG] displayManager.begin() finished.");
 
   // Check if PSRAM is initialized
   if (psramFound()) {
