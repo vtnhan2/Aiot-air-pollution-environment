@@ -190,6 +190,10 @@ void setup() {
   Serial.println("]");
 
   Serial.println("System setup complete.");
+  
+  // Hiển thị màn hình khởi động (chứa link web) khoảng 3 giây trước khi vào loop
+  displayManager.showBootScreen();
+  delay(3000);
 }
 
 void loop() {

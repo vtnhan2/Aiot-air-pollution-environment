@@ -5,14 +5,23 @@
 
 AppWiFiManager wifiManager;
 
+#include "../display/display_manager.h"
+extern DisplayManager displayManager;
+
 // Callback tự động gọi khi WiFiManager không kết nối được WiFi đã lưu và bắt đầu phát AP Setup
 void configModeCallback(::WiFiManager *myWiFiManager) {
+    String ssid = myWiFiManager->getConfigPortalSSID();
+    String pass = "12345678";
+    
     Serial.println("\n==================================================");
     Serial.println("[WiFi-DEBUG] LẦN ĐẦU KHỞI ĐỘNG HOẶC KHÔNG TÌM THẤY WIFI ĐÃ LƯU!");
-    Serial.printf("[WiFi-DEBUG] Đang phát Access Point Setup: %s (Pass: 12345678)\n", myWiFiManager->getConfigPortalSSID().c_str());
+    Serial.printf("[WiFi-DEBUG] Đang phát Access Point Setup: %s (Pass: %s)\n", ssid.c_str(), pass.c_str());
     Serial.println("[WiFi-DEBUG] Vui lòng lấy điện thoại/máy tính kết nối vào WiFi này");
     Serial.println("[WiFi-DEBUG] để cấu hình mạng WiFi mới.");
     Serial.println("==================================================\n");
+    
+    // Hiển thị lên màn hình TFT
+    displayManager.showWiFiSetup(ssid, pass);
 }
 
 void AppWiFiManager::init() {

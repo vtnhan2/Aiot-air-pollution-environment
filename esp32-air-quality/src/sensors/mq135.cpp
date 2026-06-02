@@ -3,8 +3,11 @@
 MQ135Sensor::MQ135Sensor(uint8_t measurePin) : _measurePin(measurePin) {}
 
 void MQ135Sensor::begin() {
-    // ADC configuration handled by Arduino core on first analogRead
-    // Just ensure it's set as input if needed, though analogRead does this
+    // Explicitly configure pin as input
+    pinMode(_measurePin, INPUT);
+    // Explicitly set read resolution and attenuation for ESP32-S3
+    analogReadResolution(12);
+    analogSetAttenuation(ADC_11db); // Allow reading up to ~3.1V - 3.3V
 }
 
 float MQ135Sensor::readGasLevel() {

@@ -207,3 +207,64 @@ void DisplayManager::updateData(float temp, float hum, float raw_pm25, float fil
     drawSubStats(temp, hum, gas_volts);
     drawAIPrediction(predicted_pm25);
 }
+
+void DisplayManager::showWiFiSetup(String ssid, String pass) {
+    if (!tft) return;
+    tft->fillScreen(BLACK);
+    
+    tft->fillRoundRect(10, 10, 220, 40, 5, BLUE);
+    tft->setTextColor(WHITE);
+    tft->setFont();
+    tft->setTextSize(2);
+    tft->setCursor(30, 20);
+    tft->print("WIFI SETUP");
+    
+    tft->setTextSize(1);
+    tft->setTextColor(YELLOW);
+    tft->setCursor(10, 80);
+    tft->print("1. Ket noi WiFi vao mang:");
+    
+    tft->setTextColor(CYAN);
+    tft->setCursor(10, 100);
+    tft->print("SSID: ");
+    tft->print(ssid);
+    
+    tft->setCursor(10, 120);
+    tft->print("PASS: ");
+    tft->print(pass);
+    
+    tft->setTextColor(WHITE);
+    tft->setCursor(10, 160);
+    tft->print("2. Vao trinh duyet nhap:");
+    tft->setTextColor(GREEN);
+    tft->setCursor(10, 180);
+    tft->print("IP: 192.168.4.1");
+}
+
+void DisplayManager::showBootScreen() {
+    if (!tft) return;
+    tft->fillScreen(BLACK);
+    
+    tft->fillRoundRect(10, 10, 220, 40, 5, 0x03E0); // Dark Green
+    tft->setTextColor(WHITE);
+    tft->setFont();
+    tft->setTextSize(2);
+    tft->setCursor(25, 20);
+    tft->print("SYSTEM READY");
+    
+    tft->setTextSize(1);
+    tft->setTextColor(YELLOW);
+    tft->setCursor(10, 80);
+    tft->print("Xem bieu do Online tai:");
+    
+    tft->setTextColor(CYAN);
+    tft->setTextSize(1);
+    tft->setCursor(10, 110);
+    tft->print("https://aiot-air-quality");
+    tft->setCursor(10, 130);
+    tft->print(".web.app");
+    
+    tft->setTextColor(WHITE);
+    tft->setCursor(10, 200);
+    tft->print("Dang bat dau thu thap...");
+}
