@@ -9,10 +9,10 @@
 #define PIN_I2C_SDA 21
 #define PIN_I2C_SCL 9
 
-#define PIN_GP2Y_MEASURE 4  // Analog ADC1 (Đã test)
-#define PIN_GP2Y_LED 17     // Digital Out (Đã test)
+#define PIN_GP2Y_MEASURE 16  // Analog ADC2 (Sát cạnh chân LED 17)
+#define PIN_GP2Y_LED 17      // Digital Out (Sát cạnh chân ADC 16)
 
-#define PIN_MQ135_MEASURE 16 // Analog ADC2 (Đã test)
+#define PIN_MQ135_MEASURE 4  // Analog ADC1
 
 // Định nghĩa chế độ đọc cảm biến: true = cảm biến thật, false = giả lập (sine wave)
 #define USE_REAL_SENSORS true

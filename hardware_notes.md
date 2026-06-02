@@ -24,12 +24,12 @@ Dưới đây là sơ đồ đấu nối chi tiết giữa ESP32-S3 và các lin
 | | BLK (Backlight) | **3.3V** | Nối thẳng 3.3V để luôn sáng |
 | **Cảm biến Bụi GP2Y1014** | VCC (Chân 1) | 5V (Nguồn ngoài 5V) | Cần mạch lọc RC |
 | | GND (Chân 2 & 4) | GND | Nối chung Ground |
-| | LED (Chân 3) | **GPIO 17** | Chân xuất tín hiệu kích LED |
-| | Vo (Chân 5) | **GPIO 4** | Chân đọc tín hiệu Analog (ADC1) |
+| | Vo (Chân 5) | **GPIO 16** | Chân đọc tín hiệu Analog (ADC2). Sát cạnh chân 17. |
+| | LED (Chân 3) | **GPIO 17** | Chân xuất tín hiệu kích LED. Sát cạnh chân 16. |
 | **Cảm biến MQ135** | VCC | 5V (Nguồn ngoài) | Sấy nóng tốn điện |
 | | GND | GND | Ground |
-| | AO (Analog Out) | **GPIO 16** | Chân đọc tín hiệu Analog (ADC2) |
-| **Còi Buzzer + LED Báo động** | Cực (+) | **GPIO 18** | Dùng chung 1 chân cho cả còi và còi báo động. Đệm thêm trở 220 Ohm cho LED. |
+| | AO (Analog Out) | **GPIO 4** | Chân đọc tín hiệu Analog (ADC1) |
+| **Còi Buzzer + LED Báo động** | Cực (+) | **GPIO 18** | Sát cạnh chân 17 của cảm biến Bụi. Dùng chung 1 chân cho cả còi và còi báo động. Đệm thêm trở 220 Ohm cho LED. |
 | | GND (-) | GND | Ground |
 
 ---
