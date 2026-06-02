@@ -1,179 +1,209 @@
 #include "display_manager.h"
 
-// Định nghĩa mã màu HSL/RGB565 hiện đại
-#define COLOR_BG        0x0842  // Xanh đen rất tối (Dark Navy)
-#define COLOR_CARD      0x18C5  // Xanh đen xám (Glass card effect)
-#define COLOR_TEXT_MUTED 0x9CB2 // Xám xanh nhạt
-#define COLOR_WHITE     0xFFFF
-#define COLOR_GREEN     0x3666  // Xanh lá mềm
-#define COLOR_YELLOW    0xFCE0  // Vàng ấm
-#define COLOR_RED       0xE204  // Đỏ neon
-#define COLOR_CYAN      0x27FF  // Xanh ngọc
-#define COLOR_MAGENTA   0xF19F  // Hồng tím (AI Accent)
+// Cần các thư viện này trong platformio.ini
+#include <SPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ST7789.h>
 
-DisplayManager::DisplayManager() : sprite(&tft) {}
+// Font
+#include <Fonts/FreeSans9pt7b.h>
+#include <Fonts/FreeSansBold12pt7b.h>
+#include <Fonts/FreeSans12pt7b.h>
+
+SPIClass* spiDisplay = nullptr;
+Adafruit_ST7789* tft = nullptr;
+
+DisplayManager::DisplayManager() {
+    // Sẽ khởi tạo trong begin()
+}
 
 void DisplayManager::begin() {
     Serial.println("[DEBUG] DisplayManager::begin() started...");
-    tft.init();
-    Serial.println("[DEBUG] tft.init() done.");
-    tft.setRotation(0); // 0, 1, 2, 3 tùy hướng xoay màn hình lắp thực tế
     
-    // Khởi tạo Sprite 240x240 để vẽ đệm (Double-buffering)
-    sprite.setColorDepth(16);
+    pinMode(TFT_BL, OUTPUT);
+    digitalWrite(TFT_BL, HIGH);
     
-    // Allocate in PSRAM (vì ESP32-S3 N16R8 của chúng ta có 8MB PSRAM dư dả)
-    if (psramFound()) {
-        sprite.createSprite(240, 240);
-        Serial.println("TFT Sprite created in PSRAM successfully.");
-    } else {
-        sprite.createSprite(240, 240);
-        Serial.println("TFT Sprite created in internal RAM.");
+    // Khởi tạo SPI thủ công (SCLK=13, MISO=-1, MOSI=21, CS=10)
+    spiDisplay = new SPIClass(FSPI);
+    spiDisplay->begin(TFT_SCLK, -1, TFT_MOSI, TFT_CS);
+    tft = new Adafruit_ST7789(spiDisplay, TFT_CS, TFT_DC, TFT_RST);
+    
+    // init() dành cho màn 1.54 inch ST7789
+    tft->init(240, 240);
+    tft->setRotation(0);
+    
+    Serial.println("[DEBUG] ST7789 init done.");
+    
+    // Bài test màn hình và test đèn nền ngay khi khởi động:
+    // Chớp đèn nền để kiểm tra xem LED bị đấu ngược (Active LOW/HIGH) không
+    for (int i=0; i<3; i++) {
+        digitalWrite(TFT_BL, HIGH);
+        tft->fillScreen(RED);
+        delay(300);
+        digitalWrite(TFT_BL, LOW);
+        tft->fillScreen(GREEN);
+        delay(300);
     }
+    digitalWrite(TFT_BL, HIGH); // Bật cố định
     
-    // Xóa màn hình ban đầu
-    tft.fillScreen(TFT_BLACK);
-    Serial.println("[DEBUG] DisplayManager::begin() finished.");
+    tft->fillScreen(BLUE);
+    delay(500);
+    tft->fillScreen(BLACK);
+    
+    tft->setTextColor(WHITE);
+    tft->setTextSize(2);
+    tft->setCursor(20, 120);
+    tft->print("SYSTEM BOOTING...");
+    Serial.println("[DEBUG] Display ready.");
 }
 
-void DisplayManager::updateData(float temp, float hum, float raw_pm25, float filtered_pm25, float predicted_pm25, float gas_volts, bool wifi_connected, bool anomaly) {
-    // 1. Clear Sprite bằng màu nền tối
-    sprite.fillSprite(COLOR_BG);
-    
-    // 2. Vẽ khung viền trang trí bo góc nhẹ
-    sprite.drawRoundRect(2, 2, 236, 236, 8, COLOR_CARD);
-    
-    // 3. Vẽ các phân vùng giao diện
-    drawHeader(wifi_connected);
-    drawPM25(filtered_pm25, raw_pm25, anomaly);
-    drawAIPrediction(predicted_pm25);
-    drawSubStats(temp, hum, gas_volts);
-    
-    // 4. Đẩy toàn bộ Sprite lên màn hình ST7789 cùng một lúc (Zero flicker)
-    sprite.pushSprite(0, 0);
-}
-
-void DisplayManager::drawHeader(bool wifi_connected) {
-    // Tiêu đề trạm đo
-    sprite.setTextColor(COLOR_WHITE, COLOR_BG);
-    sprite.drawString("AIoT AIR STATION", 10, 10, 2);
-    
-    // Wifi Badge
-    if (wifi_connected) {
-        sprite.fillRoundRect(170, 8, 60, 18, 4, COLOR_GREEN);
-        sprite.setTextColor(COLOR_WHITE, COLOR_GREEN);
-        sprite.drawCentreString("WiFi", 200, 10, 1);
-    } else {
-        sprite.fillRoundRect(170, 8, 60, 18, 4, COLOR_RED);
-        sprite.setTextColor(COLOR_WHITE, COLOR_RED);
-        sprite.drawCentreString("Offline", 200, 10, 1);
-    }
-    
-    // Đường gạch ngang phân tách header
-    sprite.drawLine(10, 32, 230, 32, COLOR_CARD);
-}
-
-void DisplayManager::drawPM25(float filtered, float raw, bool anomaly) {
-    // Tiêu đề khu vực bụi
-    sprite.setTextColor(COLOR_TEXT_MUTED, COLOR_BG);
-    sprite.drawString("PM2.5 (Current)", 12, 38, 1);
-    
-    // Vẽ số liệu bụi (Dùng font cỡ lớn số 6 nếu là số nguyên, hoặc dùng font 4 để dễ canh lề)
-    uint16_t color = getAQIColor(filtered);
-    sprite.setTextColor(color, COLOR_BG);
-    
-    // Format chuỗi bụi mịn
-    char pm_str[10];
-    sprintf(pm_str, "%.1f", filtered);
-    sprite.drawString(pm_str, 12, 48, 6); // Font 6: Chữ số lớn
-    
-    // Đơn vị ug/m3 nhỏ phía sau
-    int text_width = sprite.textWidth(pm_str, 6);
-    sprite.setTextColor(COLOR_TEXT_MUTED, COLOR_BG);
-    sprite.drawString("ug/m3", 16 + text_width, 74, 2);
-    
-    // Hiển thị trạng thái/Cảnh báo Anomaly
-    if (anomaly) {
-        sprite.fillRoundRect(130, 48, 98, 38, 4, COLOR_RED);
-        sprite.setTextColor(COLOR_WHITE, COLOR_RED);
-        sprite.drawCentreString("SPIKE", 179, 52, 2);
-        sprite.drawCentreString("FILTERED", 179, 68, 1);
-    } else {
-        String status = getAQIStatus(filtered);
-        sprite.drawRoundRect(130, 48, 98, 38, 4, color);
-        sprite.setTextColor(color, COLOR_BG);
-        sprite.drawCentreString(status, 179, 58, 2);
-    }
-}
-
-void DisplayManager::drawAIPrediction(float predicted) {
-    // Card hiệu ứng Glassmorphism cho phần AI
-    sprite.fillRoundRect(10, 98, 220, 68, 6, COLOR_CARD);
-    
-    // Label AI
-    sprite.setTextColor(COLOR_MAGENTA, COLOR_CARD);
-    sprite.drawString("🧠 AI FORECAST (Next 1h)", 18, 104, 2);
-    
-    // Giá trị dự báo
-    sprite.setTextColor(COLOR_WHITE, COLOR_CARD);
-    char pred_str[15];
-    sprintf(pred_str, "%.1f ug/m3", predicted);
-    sprite.drawString(pred_str, 18, 128, 4); // Font 4: Chữ trung bình lớn
-    
-    // Badge Đánh giá chất lượng không khí tương lai
-    uint16_t color = getAQIColor(predicted);
-    String status = getAQIStatus(predicted);
-    
-    sprite.fillRoundRect(150, 128, 70, 22, 4, color);
-    sprite.setTextColor(COLOR_WHITE, color);
-    sprite.drawCentreString(status, 185, 132, 1);
-}
-
-void DisplayManager::drawSubStats(float temp, float hum, float gas) {
-    // Vẽ đường phân cách
-    sprite.drawLine(10, 178, 230, 178, COLOR_CARD);
-    
-    // Chia làm 3 cột hiển thị: Nhiệt, Ẩm, Khí Gas
-    
-    // Cột 1: Nhiệt độ
-    sprite.setTextColor(COLOR_TEXT_MUTED, COLOR_BG);
-    sprite.drawCentreString("TEMP", 45, 184, 1);
-    sprite.setTextColor(COLOR_CYAN, COLOR_BG);
-    char temp_str[10];
-    sprintf(temp_str, "%.1f C", temp);
-    sprite.drawCentreString(temp_str, 45, 202, 2);
-    
-    // Cột 2: Độ ẩm
-    sprite.setTextColor(COLOR_TEXT_MUTED, COLOR_BG);
-    sprite.drawCentreString("HUMID", 120, 184, 1);
-    sprite.setTextColor(COLOR_CYAN, COLOR_BG);
-    char hum_str[10];
-    sprintf(hum_str, "%.1f%%", hum);
-    sprite.drawCentreString(hum_str, 120, 202, 2);
-    
-    // Cột 3: Khí Gas (MQ135)
-    sprite.setTextColor(COLOR_TEXT_MUTED, COLOR_BG);
-    sprite.drawCentreString("GAS VOLT", 195, 184, 1);
-    
-    // Đổi màu cảnh báo khí gas nếu điện áp cao
-    if (gas > 1.8f) {
-        sprite.setTextColor(COLOR_RED, COLOR_BG);
-    } else {
-        sprite.setTextColor(COLOR_WHITE, COLOR_BG);
-    }
-    char gas_str[10];
-    sprintf(gas_str, "%.2f V", gas);
-    sprite.drawCentreString(gas_str, 195, 202, 2);
+void DisplayManager::drawCentreString(const char* text, int x, int y, uint8_t size, uint16_t color) {
+    tft->setTextSize(size);
+    tft->setTextColor(color);
+    int16_t x1, y1;
+    uint16_t w, h;
+    tft->getTextBounds(text, 0, 0, &x1, &y1, &w, &h);
+    tft->setCursor(x - w / 2, y + h / 2);
+    tft->print(text);
 }
 
 uint16_t DisplayManager::getAQIColor(float pm25) {
-    if (pm25 < 30.0f) return COLOR_GREEN;
-    if (pm25 < 80.0f) return COLOR_YELLOW;
-    return COLOR_RED;
+    if (pm25 <= 12.0) return GREEN;
+    if (pm25 <= 35.4) return YELLOW;
+    if (pm25 <= 55.4) return ORANGE;
+    if (pm25 <= 150.4) return RED;
+    if (pm25 <= 250.4) return MAGENTA;
+    return 0x780F; // Tím đậm / Nâu
 }
 
 String DisplayManager::getAQIStatus(float pm25) {
-    if (pm25 < 30.0f) return "GOOD";
-    if (pm25 < 80.0f) return "MODERATE";
-    return "BAD";
+    if (pm25 <= 12.0) return "GOOD";
+    if (pm25 <= 35.4) return "MODERATE";
+    if (pm25 <= 55.4) return "SENSITIVE";
+    if (pm25 <= 150.4) return "UNHEALTHY";
+    if (pm25 <= 250.4) return "VERY UNHEALTHY";
+    return "HAZARDOUS";
+}
+
+void DisplayManager::drawGrid() {
+    tft->fillScreen(BLACK);
+    
+    // Viền ngoài
+    tft->drawRect(0, 0, 240, 240, WHITE);
+    
+    // Khung PM2.5 (Nửa trái)
+    tft->drawRect(0, 30, 120, 100, WHITE);
+    
+    // Khung Temp/Hum/Gas (Nửa phải)
+    tft->drawRect(120, 30, 120, 100, WHITE);
+    
+    // Khung Dự báo AI (Dưới cùng)
+    tft->drawRect(0, 130, 240, 110, WHITE);
+}
+
+void DisplayManager::drawHeader(bool wifi_connected) {
+    tft->fillRect(0, 0, 240, 30, 0x01E8); // Xanh dương đậm
+    tft->setFont(&FreeSans9pt7b);
+    tft->setTextColor(WHITE);
+    tft->setCursor(5, 20);
+    tft->print("AIoT Monitor");
+    
+    // Icon WiFi
+    if (wifi_connected) {
+        tft->fillCircle(220, 15, 4, GREEN);
+        tft->drawCircle(220, 15, 8, GREEN);
+    } else {
+        tft->drawLine(210, 5, 230, 25, RED);
+        tft->drawLine(210, 25, 230, 5, RED);
+    }
+}
+
+void DisplayManager::drawPM25(float filtered, float raw, bool anomaly) {
+    uint16_t color = getAQIColor(filtered);
+    
+    tft->setFont(); // Font mặc định
+    tft->setTextColor(WHITE);
+    tft->setCursor(5, 40);
+    tft->print("PM2.5 (ug/m3)");
+    
+    tft->setFont(&FreeSansBold12pt7b);
+    tft->setTextColor(color);
+    char pmBuf[10];
+    sprintf(pmBuf, "%.1f", filtered);
+    drawCentreString(pmBuf, 60, 80, 1, color);
+    
+    tft->setFont();
+    tft->setTextColor(WHITE);
+    String status = getAQIStatus(filtered);
+    drawCentreString(status.c_str(), 60, 110, 1, color);
+    
+    if (anomaly) {
+        tft->fillRoundRect(100, 35, 15, 15, 3, RED);
+        tft->setTextColor(WHITE);
+        tft->setCursor(104, 39);
+        tft->print("!");
+    }
+}
+
+void DisplayManager::drawSubStats(float temp, float hum, float gas) {
+    tft->setFont(); // Font mặc định nhỏ
+    tft->setTextColor(WHITE);
+    
+    // Nhiệt độ
+    tft->setCursor(125, 45);
+    tft->print("Temp: ");
+    tft->setTextColor(YELLOW);
+    tft->print(temp, 1);
+    tft->print(" C");
+    
+    // Độ ẩm
+    tft->setTextColor(WHITE);
+    tft->setCursor(125, 75);
+    tft->print("Hum:  ");
+    tft->setTextColor(CYAN);
+    tft->print(hum, 1);
+    tft->print(" %");
+    
+    // Khí Gas
+    tft->setTextColor(WHITE);
+    tft->setCursor(125, 105);
+    tft->print("Gas:  ");
+    uint16_t gasColor = (gas > 1.5) ? RED : GREEN;
+    tft->setTextColor(gasColor);
+    tft->print(gas, 2);
+    tft->print(" V");
+}
+
+void DisplayManager::drawAIPrediction(float predicted) {
+    tft->fillRect(1, 131, 238, 25, 0x3186); // Nền xám cho Header AI
+    tft->setFont(&FreeSans9pt7b);
+    tft->setTextColor(WHITE);
+    tft->setCursor(5, 149);
+    tft->print("AI Forecast (1h)");
+    
+    uint16_t color = getAQIColor(predicted);
+    
+    tft->setFont(&FreeSansBold12pt7b);
+    tft->setTextColor(color);
+    char buf[10];
+    sprintf(buf, "%.1f", predicted);
+    drawCentreString(buf, 120, 190, 1, color);
+    
+    tft->setFont();
+    tft->setTextColor(WHITE);
+    String advice = "Normal";
+    if (predicted > 50) advice = "Wear Mask!";
+    if (predicted > 100) advice = "Stay Indoors!";
+    
+    drawCentreString(advice.c_str(), 120, 220, 1, color);
+}
+
+void DisplayManager::updateData(float temp, float hum, float raw_pm25, float filtered_pm25, float predicted_pm25, float gas_volts, bool wifi_connected, bool anomaly) {
+    if (!tft) return;
+    
+    drawGrid();
+    drawHeader(wifi_connected);
+    drawPM25(filtered_pm25, raw_pm25, anomaly);
+    drawSubStats(temp, hum, gas_volts);
+    drawAIPrediction(predicted_pm25);
 }

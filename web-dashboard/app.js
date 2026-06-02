@@ -91,17 +91,12 @@ const airChart = new Chart(ctx, {
 const dataHistory = [];
 let activeTab = 'pm25'; // 'pm25', 'weather', 'gas'
 
-// Firebase elements from index.html
-const db = window.firebaseDB;
-const dbRef = window.firebaseRef;
-const onValue = window.firebaseOnValue;
+let demoInterval = null;
+let firebaseListenersActive = false;
 
 const modeSwitch = document.getElementById('mode-switch');
 const statusBadge = document.getElementById('status-badge');
 const statusText = document.getElementById('status-text');
-
-let demoInterval = null;
-let firebaseListenersActive = false;
 
 // 1. Listen to Demo/Realtime toggle switch
 modeSwitch.addEventListener('change', (e) => {
@@ -189,18 +184,23 @@ function stopSimulation() {
 // 3. Firebase listeners (Realtime Mode)
 function setupFirebaseListeners() {
     if (firebaseListenersActive) return;
+
+    const db = window.firebaseDB;
+    const dbRef = window.firebaseRef;
+    const onValue = window.firebaseOnValue;
+    const queryFn = window.firebaseQuery;
+    const limitToLastFn = window.firebaseLimitToLast;
+    const getFn = window.firebaseGet;
+
     if (!db || !dbRef || !onValue) {
-        console.error("Firebase SDK not loaded properly!");
+        console.warn("Firebase SDK not loaded yet. Retrying in 500ms...");
+        setTimeout(setupFirebaseListeners, 500);
         return;
     }
 
     console.log("Firebase is initialized. Waiting for data...");
     const sensorRef = dbRef(db, 'sensor');
     const aiRef = dbRef(db, 'ai');
-
-    const queryFn = window.firebaseQuery;
-    const limitToLastFn = window.firebaseLimitToLast;
-    const getFn = window.firebaseGet;
 
     // Load last 30 historical records from Firebase first
     if (queryFn && limitToLastFn && getFn) {

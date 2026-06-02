@@ -12,26 +12,24 @@ Dưới đây là sơ đồ đấu nối chi tiết giữa ESP32-S3 và các lin
 | :--- | :--- | :--- | :--- |
 | **Cảm biến BME280** | VCC | 3.3V | Cấp nguồn 3.3V |
 | | GND | GND | Ground |
-| | SDA | **GPIO 8** | Giao tiếp I2C |
+| | SDA | **GPIO 21** | Giao tiếp I2C |
 | | SCL | **GPIO 9** | Giao tiếp I2C |
-| **Cảm biến Bụi GP2Y1014** | VCC (Chân 1) | 5V (hoặc Nguồn ngoài 5V) | Cần mạch lọc RC (Trở 150 $\Omega$ + Tụ 220uF) |
-| | GND (Chân 2 & 4) | GND | Nối chung Ground |
-| | LED (Chân 3) | **GPIO 5** | Chân điều khiển xung LED |
-| | Vo (Chân 5) | **GPIO 4** | Chân đọc tín hiệu Analog (ADC) |
-| **Cảm biến MQ135** | VCC | 5V (Nguồn ngoài khuyên dùng) | Cực kỳ tốn điện (Sấy nóng) |
-| | GND | GND | Ground |
-| | AO (Analog Out) | **GPIO 1** | Chân đọc tín hiệu Analog (ADC) |
 | **Màn hình ST7789 IPS** | VCC | 3.3V | Cấp nguồn 3.3V |
 | | GND | GND | Ground |
-| | SCL (SCLK) | **GPIO 12** | Giao tiếp SPI Clock |
-| | SDA (MOSI) | **GPIO 11** | Giao tiếp SPI Data |
-| | RES (Reset) | **GPIO 14** | Chân reset màn hình |
-| | DC (RS/Data-Cmd)| **GPIO 13** | Chân chọn Dữ liệu/Lệnh |
-| | CS (Chip Select) | **GPIO 10** | (Nối GND nếu màn hình không có chân CS) |
-| | BLK (Backlight) | **GPIO 15** | Điều khiển độ sáng màn hình |
-| **Còi chip (Buzzer)** | VCC / I/O | **GPIO 6** | Điều khiển bật còi (KY-012/KY-006) |
+| | MOSI (SDA) | **GPIO 39** | Giao tiếp SPI Data |
+| | SCLK (SCL) | **GPIO 40** | Giao tiếp SPI Clock |
+| | CS | **GPIO 41** | Chip Select |
+| | DC (RS/Data-Cmd)| **GPIO 45** | Chân chọn Dữ liệu/Lệnh |
+| | RES (Reset) | **GPIO 48** | Chân reset màn hình |
+| | BLK (Backlight) | **3.3V** | Nối thẳng 3.3V để luôn sáng |
+| **Cảm biến Bụi GP2Y1014** | VCC (Chân 1) | 5V (Nguồn ngoài 5V) | Cần mạch lọc RC |
+| | GND (Chân 2 & 4) | GND | Nối chung Ground |
+| | LED (Chân 3) | **GPIO 17** | Chân xuất tín hiệu kích LED |
+| | Vo (Chân 5) | **GPIO 4** | Chân đọc tín hiệu Analog (ADC1) |
+| **Cảm biến MQ135** | VCC | 5V (Nguồn ngoài) | Sấy nóng tốn điện |
 | | GND | GND | Ground |
-| **LED Cảnh báo** | Dương cực (+) | **GPIO 7** | Đèn báo đỏ (Cần thêm trở 220 $\Omega$ hạn dòng) |
+| | AO (Analog Out) | **GPIO 16** | Chân đọc tín hiệu Analog (ADC2) |
+| **Còi Buzzer + LED Báo động** | Cực (+) | **GPIO 18** | Dùng chung 1 chân cho cả còi và còi báo động. Đệm thêm trở 220 Ohm cho LED. |
 | | GND (-) | GND | Ground |
 
 ---

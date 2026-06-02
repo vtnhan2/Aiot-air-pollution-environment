@@ -20,9 +20,9 @@
 // lỗi API Key trên Serial Monitor)
 #define USE_FIREBASE true
 
-// Định nghĩa chân Còi Buzzer và LED cảnh báo
-#define PIN_BUZZER 6
-#define PIN_LED_WARN 7
+// Định nghĩa chân Còi Buzzer và LED cảnh báo (Dùng chung 1 chân)
+#define PIN_BUZZER 18
+#define PIN_LED_WARN 18
 
 SensorManager sensorManager;
 DisplayManager displayManager;
@@ -100,7 +100,15 @@ int8_t input_buffer[24][4] = {0};
 int step_count = 0;
 void setup() {
   Serial.begin(115200);
-  delay(2000);
+  delay(1000);
+
+// Tắt đèn RGB LED trên mạch ESP32-S3 (Chân 48) để đỡ chói mắt
+#ifdef RGB_BUILTIN
+  neopixelWrite(RGB_BUILTIN, 0, 0, 0);
+#else
+  neopixelWrite(48, 0, 0, 0);
+#endif
+
   Serial.println("\n--- AIoT Air Quality System Starting ---");
 
   // Khởi tạo các cảm biến
@@ -309,7 +317,8 @@ void loop() {
       bool pushHistory = false;
 
       // Đẩy dữ liệu vào lịch sử định kỳ mỗi 60 giây (1 phút)
-      if (millis() - lastFirebaseHistoryUpdate > 60000 || lastFirebaseHistoryUpdate == 0) {
+      if (millis() - lastFirebaseHistoryUpdate > 60000 ||
+          lastFirebaseHistoryUpdate == 0) {
         pushHistory = true;
         lastFirebaseHistoryUpdate = millis();
       }

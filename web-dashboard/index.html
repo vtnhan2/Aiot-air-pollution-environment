@@ -11,24 +11,34 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Firebase SDK (Dạng module) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, query, limitToLast, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    <!-- Firebase SDK (v8 Compat) để có thể chạy trực tiếp file HTML (file:///) mà không bị lỗi CORS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-        import firebaseConfig from "./config.js";
+    <script>
+        // Cấu hình Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDe39AK00HEJaP-dhde3BG97aK4YIS-jhA",
+            authDomain: "aiot-air-quality.firebaseapp.com",
+            databaseURL: "https://aiot-air-quality-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "aiot-air-quality",
+            storageBucket: "aiot-air-quality.firebasestorage.app",
+            messagingSenderId: "883689786120",
+            appId: "1:883689786120:web:33ec4bf77aad79fc22babd",
+            measurementId: "G-M8VFG0E60M"
+        };
 
         // Khởi tạo Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        // Xuất ra biến Global để app.js có thể gọi được
+        // Gán ra Global để app.js dùng (với các hàm bọc lại giống v10)
         window.firebaseDB = db;
-        window.firebaseRef = ref;
-        window.firebaseOnValue = onValue;
-        window.firebaseQuery = query;
-        window.firebaseLimitToLast = limitToLast;
-        window.firebaseGet = get;
+        window.firebaseRef = function(dbInstance, path) { return dbInstance.ref(path); };
+        window.firebaseOnValue = function(ref, callback) { ref.on('value', callback); };
+        window.firebaseQuery = function(ref, modifier) { return modifier(ref); };
+        window.firebaseLimitToLast = function(num) { return function(ref) { return ref.limitToLast(num); } };
+        window.firebaseGet = function(ref) { return ref.once('value'); };
     </script>
 
     <link rel="stylesheet" href="style.css">

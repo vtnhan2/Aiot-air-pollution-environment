@@ -5,17 +5,17 @@
 #include "gp2y1014.h"
 #include "mq135.h"
 
-// Define GPIO pins based on implementation plan
-#define PIN_I2C_SDA 8
+// Define GPIO pins based on implementation// I2C Pins cho BME280 (Đã Re-map)
+#define PIN_I2C_SDA 21
 #define PIN_I2C_SCL 9
 
-#define PIN_GP2Y_MEASURE 4
-#define PIN_GP2Y_LED 5
+#define PIN_GP2Y_MEASURE 4  // Analog ADC1 (Đã test)
+#define PIN_GP2Y_LED 17     // Digital Out (Đã test)
 
-#define PIN_MQ135_MEASURE 1
+#define PIN_MQ135_MEASURE 16 // Analog ADC2 (Đã test)
 
 // Định nghĩa chế độ đọc cảm biến: true = cảm biến thật, false = giả lập (sine wave)
-#define USE_REAL_SENSORS false
+#define USE_REAL_SENSORS true
 
 struct SensorData {
     float temperature;
