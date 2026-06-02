@@ -45,14 +45,28 @@ Node.js là môi trường bắt buộc để chạy lệnh đẩy (deploy) webs
 ---
 
 ## 3. Cài đặt PlatformIO (Cho ESP32-S3)
-PlatformIO là công cụ tích hợp ngay trong VSCode giúp biên dịch mã C++ và quản lý thư viện cực kỳ tự động cho mạch ESP32.
+PlatformIO là công cụ giúp biên dịch mã C++ và quản lý thư viện cực kỳ tự động cho mạch ESP32. Có 2 cách để cài đặt (Khuyến nghị dùng Cách 1):
 
+### Cách 1: Cài thông qua VSCode Extension (Dành cho người mới)
 1. Mở **VSCode**.
 2. Bấm vào biểu tượng **Extensions** (Tiện ích mở rộng) ở cột bên trái (hoặc nhấn `Ctrl + Shift + X`).
 3. Gõ vào ô tìm kiếm: `PlatformIO IDE`.
 4. Nhấn **Install**. 
    - *Lưu ý: Quá trình cài đặt ngầm có thể mất 3-5 phút tùy mạng, hãy nhìn góc dưới cùng bên phải của VSCode để xem tiến trình. Sau khi cài xong, VSCode có thể yêu cầu **Reload Window** (Khởi động lại).*
 5. Bấm nút biểu tượng con kiến (PlatformIO) ở thanh bên trái để kiểm tra xem nó đã hoạt động chưa.
+
+### Cách 2: Cài thông qua Python pip (Dành cho người thích dùng dòng lệnh / Terminal)
+Nếu bạn đã cài sẵn Python trên máy, bạn có thể cài lõi của PlatformIO (Core CLI) trực tiếp bằng lệnh `pip`:
+1. Tải và cài đặt Python từ: [https://www.python.org/downloads/](https://www.python.org/downloads/) (Nhớ tick vào ô *"Add Python to PATH"* khi cài đặt).
+2. Mở Terminal (PowerShell hoặc CMD) và gõ lệnh sau để cài đặt PlatformIO:
+   ```powershell
+   pip install platformio
+   ```
+3. Sau khi cài xong, bạn có thể kiểm tra lại bằng lệnh:
+   ```powershell
+   pio --version
+   ```
+   *(Với cách này, bạn có thể dùng lệnh `pio run -t upload` để nạp code thẳng từ Terminal mà không cần dùng giao diện VSCode).*
 
 ---
 
