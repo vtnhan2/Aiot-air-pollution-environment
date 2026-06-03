@@ -990,7 +990,7 @@ def slide_product():
     prod = os.path.join(MEDIA, "product.jpg")
     rotated = os.path.join(MEDIA, "_product_rot.png")
     try:
-        im = Image.open(prod).rotate(-90, expand=True)
+        im = Image.open(prod).rotate(90, expand=True)
         im.save(rotated)
         prod_use = rotated
     except Exception:
