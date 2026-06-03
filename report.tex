@@ -1208,13 +1208,7 @@ Bảng~\ref{tab:performance} tổng hợp kết quả hiệu năng thực nghi�
 
 \begin{figure}[H]
   \centering
-  \fbox{\begin{minipage}{0.85\textwidth}
-    \centering
-    \vspace{2cm}
-    \textit{[Chèn hình: Đồ thị Web Dashboard thể hiện PM2.5 thô (đường đỏ) vọt lên đỉnh gai nhiễu $\approx 506~\mu\text{g/m}^3$}\\
-    \textit{trong khi PM2.5 đã lọc (đường xanh dương) tiếp tục đi bằng phẳng ổn định quanh $40$--$50~\mu\text{g/m}^3$]}
-    \vspace{2cm}
-  \end{minipage}}
+  \includegraphics[width=0.85\textwidth]{Bia_mau_media/chart.png}
   \caption{Kết quả thực nghiệm: Bộ lọc Z-Score+EMA phát hiện và triệt tiêu gai nhiễu PM2.5 đột biến cực lớn, bảo vệ đầu vào cho mô hình LSTM}
   \label{fig:chart_experimental}
 \end{figure}
@@ -1247,14 +1241,7 @@ if (final_pm25 >= 80.0f) {
 
 \begin{figure}[H]
   \centering
-  \fbox{\begin{minipage}{0.6\textwidth}
-    \centering
-    \vspace{3.5cm}
-    \textit{[Chèn ảnh: Sản phẩm phần cứng thực tế -- ESP32-S3 DevKit trên breadboard;}\\
-    \textit{cảm biến BME280, Sharp GP2Y1014 qua mạch lọc RC, MQ135;}\\
-    \textit{màn hình IPS ST7789 240$\times$240 hiển thị giao diện Dark mode]}
-    \vspace{3.5cm}
-  \end{minipage}}
+  \includegraphics[angle=90, width=0.8\textwidth]{Bia_mau_media/product.jpg}
   \caption{Hệ thống phần cứng hoàn chỉnh: ESP32-S3 tích hợp ba cảm biến môi trường, màn hình IPS ST7789, còi buzzer và LED cảnh báo}
   \label{fig:real_device}
 \end{figure}
